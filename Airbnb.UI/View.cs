@@ -1,4 +1,5 @@
 using Airbnb.CORE;
+using Airbnb.CORE.Models;
 
 namespace Airbnb.UI;
 
@@ -53,8 +54,85 @@ Select mode:
 2. Make a Reservation
 3. Edit a Reservation
 4. Cancel a Reservation
+5. View Guests
+6. View Hosts
 Enter Choice: 
-", 0, 4);
+", 0, 6);
   }
-  
+
+  public static Guest GetGuest()
+  {
+    var guest = new Guest();
+
+    guest.Name = Validation.PromptRequired("Enter your first name: ");
+    guest.LastName = Validation.PromptRequired("Enter your last name: ");
+    guest.Email = Validation.PromptRequired("Enter your email: ");
+    return guest;
+  }
+
+  public static void DisplayRed(string required)
+  {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine(required);
+    Console.ResetColor();
+  }
+
+  public static void LineBreak()
+  {
+    Console.WriteLine();
+  }
+
+  public static void DisplayInLine(string message)
+  {
+    Console.Write(message);
+  }
+
+  public static string GetGuestPrefix()
+  {
+    throw new NotImplementedException();
+  }
+  public static int GetGuestSearchMethod()
+  {
+    Display("Select Search Method");
+    Display("1. Email");
+    Display("2. Name");
+    return (int)Validation.PromptUser4Num("Enter your choice [1-2]: ", 1, 2);
+  }
+  public static string GetNamePrefix()
+  {
+    bool isValid = false;
+    string ret = "";
+    while (!isValid)
+    {
+      ret = Validation.ReadRequiredString("Guest name starts with: ");
+      if (ret.Contains(","))
+      {
+        Display("Forager name cannot contain a comma.");
+      }
+      else
+      {
+        isValid = true;
+      }
+    }
+    return ret;
+  }
+
+  public static void DisplayGuests(List<Guest> guests)
+  {
+    if(guests == null || guests.Count == 0)
+    {
+      Display("No guests found");
+    }
+    int index = 1;
+    foreach(Guest guest in guests.Take(25))
+    {
+      Display($"{index++}: {guest.Name}");
+    }
+
+    if(guests.Count > 25)
+    {
+      Display("More than 25 foragers found. Showing first 25. Please refine your search.");
+    }
+    Display("0: Exit");
+  }
 }

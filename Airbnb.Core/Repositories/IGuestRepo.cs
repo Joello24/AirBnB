@@ -8,5 +8,5 @@ public interface IGuestRepo
     Result<Guest> FindByEmail(string email);
     Result<Guest> Create(Guest guest);
     Result<Guest> Update(Guest guest);
-    Result<Guest> Delete(string id);
+    Result<Guest> Delete(int id);
 }

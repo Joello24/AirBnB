@@ -21,7 +21,24 @@ public static class Validation
 
     return res;
   }
+  public static string ReadRequiredString(string prompt)
+  {
+    while(true)
+    {
+      string result = ReadString(prompt);
+      if(!string.IsNullOrWhiteSpace(result))
+      {
+        return result;
+      }
+      View.DisplayRed("REQUIRED");
+    }
+  }
 
+  public static string ReadString(string prompt)
+  {
+    View.Display(prompt);
+    return Console.ReadLine();
+  }
   internal static string PromptUser(string message)
   {
     Console.Write(message);

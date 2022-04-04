@@ -10,7 +10,7 @@ namespace Airbnb.Core
     {
         public void Log(string message)
         {
-            Console.WriteLine(message);
+            Console.Write(message);
         }
     }
 }

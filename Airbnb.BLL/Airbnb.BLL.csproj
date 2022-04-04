@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Airbnb.Core\Airbnb.Core.csproj" />
+      <ProjectReference Include="..\Airbnb.DAL\Airbnb.DAL.csproj" />
     </ItemGroup>
 
 </Project>

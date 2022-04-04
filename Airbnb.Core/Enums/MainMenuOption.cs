@@ -6,7 +6,10 @@ Exit,
 ViewReservations,
 MakeReservation,
 EditReservation,
-CancelReservation
+CancelReservation,
+ViewGuests,
+ViewHosts,
+
 }
 
 public static class MenuOptionExtensions
@@ -14,10 +17,12 @@ public static class MenuOptionExtensions
     public static string ToLabel(this MainMenuOption option) => option switch
     {
         MainMenuOption.Exit => "Exit",
-        MainMenuOption.ViewReservations => "View Forages By Date",
-        MainMenuOption.MakeReservation => "View Items",
-        MainMenuOption.EditReservation => "View Foragers",
-        MainMenuOption.CancelReservation => "Add a Forage",
+        MainMenuOption.ViewReservations => "View Reservations",
+        MainMenuOption.MakeReservation => "Make Reservation",
+        MainMenuOption.EditReservation => "Edit Reservation",
+        MainMenuOption.CancelReservation => "Cancel Reservation",
+        MainMenuOption.ViewGuests => "View Guests",
+        MainMenuOption.ViewHosts => "View Hosts",
         _ => throw new NotImplementedException()
     };
 }

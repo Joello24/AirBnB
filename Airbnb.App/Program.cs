@@ -127,5 +127,7 @@ User interface testing is not required.
  * ENTRY:       Controller -> HostService -> HostRepository
  * ENTRY:       Controller -> ReservationService -> ReservationRepository
  *
+ * TODO: DETERMINE ID TYPES ??? GUEST-INT ID, HOST-GUID ID, RESERVATION-INT ID ???
+ * IMPORTANT: RESERVATIONS ARE STORED AS A CSV FILE NAMED BY HOST GUID
  * 
  */
