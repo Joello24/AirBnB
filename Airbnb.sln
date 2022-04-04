@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airbnb.App", "Airbnb.App\Airbnb.App.csproj", "{FD40419F-3046-4148-967B-01C60819C4F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airbnb.UI", "Airbnb.UI\Airbnb.UI.csproj", "{0F488B91-62DD-4919-A530-77CB122D251F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airbnb.BLL", "Airbnb.BLL\Airbnb.BLL.csproj", "{11028ABE-9853-4559-99E6-192CD2352A63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airbnb.DAL", "Airbnb.DAL\Airbnb.DAL.csproj", "{020B99FE-720F-4BF3-B5A3-0D5140445B63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Airbnb.Core", "Airbnb.Core\Airbnb.Core.csproj", "{B4A67FE7-D57E-4033-9BDF-F05FD70C61F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD40419F-3046-4148-967B-01C60819C4F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD40419F-3046-4148-967B-01C60819C4F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD40419F-3046-4148-967B-01C60819C4F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD40419F-3046-4148-967B-01C60819C4F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F488B91-62DD-4919-A530-77CB122D251F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F488B91-62DD-4919-A530-77CB122D251F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F488B91-62DD-4919-A530-77CB122D251F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F488B91-62DD-4919-A530-77CB122D251F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11028ABE-9853-4559-99E6-192CD2352A63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11028ABE-9853-4559-99E6-192CD2352A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11028ABE-9853-4559-99E6-192CD2352A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11028ABE-9853-4559-99E6-192CD2352A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{020B99FE-720F-4BF3-B5A3-0D5140445B63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{020B99FE-720F-4BF3-B5A3-0D5140445B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{020B99FE-720F-4BF3-B5A3-0D5140445B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{020B99FE-720F-4BF3-B5A3-0D5140445B63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4A67FE7-D57E-4033-9BDF-F05FD70C61F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4A67FE7-D57E-4033-9BDF-F05FD70C61F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4A67FE7-D57E-4033-9BDF-F05FD70C61F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4A67FE7-D57E-4033-9BDF-F05FD70C61F5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
