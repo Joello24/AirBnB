@@ -18,7 +18,7 @@ public class GuestService
     public List<Guest> FindByNameSearch(string namePrefix)
     {
         return _guestRepository.FindAll().Value
-            .Where(x => x.Name.StartsWith(namePrefix)).ToList();
+            .Where(x => x.LastName.StartsWith(namePrefix)).ToList();
     }
     public Result<Guest> FindByEmail(string email)
     {

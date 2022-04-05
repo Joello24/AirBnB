@@ -122,7 +122,7 @@ public class GuestFileRepository : IGuestRepo
             ret.AddMessage("Guest not found");
             return ret;
         }   
-        guestToUpdate.Name = guest.Name;
+        guestToUpdate.FirstName = guest.FirstName;
         guestToUpdate.LastName = guest.LastName;
         guestToUpdate.Email = guest.Email;
         WriteToFile(guests);

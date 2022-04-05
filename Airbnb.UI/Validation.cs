@@ -36,7 +36,7 @@ public static class Validation
 
   public static string ReadString(string prompt)
   {
-    View.Display(prompt);
+    View.DisplayInLine(prompt);
     return Console.ReadLine();
   }
   internal static string PromptUser(string message)
@@ -67,12 +67,12 @@ Press Enter to Continue");
   }
 
   // default here means it takes the absolute minimum value for a DateOnly
-  internal static DateOnly PromptUser4Date(string message, DateOnly max)
+  internal static DateOnly PromptUser4Date(string message)
   {
     DateOnly result;
-    while (!(DateOnly.TryParse(PromptUser(message), out result)) || (result > max))
+    while (!(DateOnly.TryParse(PromptUser(message), out result)))
     {
-      PromptUser($"Invalid Input, must be before {max}.");
+      PromptUser($"Invalid Input.");
       Prompt2Continue();
     }
     return result;

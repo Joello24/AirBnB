@@ -13,7 +13,7 @@ public static class Startup
     const string guestFile = dataDir + "guests.csv";
     const string hostFile = dataDir + "hosts.csv";
     const string logFile = dataDir + "log.error.csv";
-    const string reservationFile = dataDir + "reservations.csv";
+    const string reservationsDir = dataDir + "reservations/";
   
     View.DisplayHeader("Welcome to Weather Almanac");
     
@@ -25,7 +25,7 @@ public static class Startup
       _ => throw new ArgumentOutOfRangeException()
     };
 
-    NinjectContainer.Configure(logMode, guestFile,hostFile,reservationFile, logFile );
+    NinjectContainer.Configure(logMode, guestFile,hostFile,reservationsDir, logFile );
     var controller = NinjectContainer.Kernel.Get<Controller>();
     
     controller.Run();

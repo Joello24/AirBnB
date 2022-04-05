@@ -64,7 +64,7 @@ Enter Choice:
   {
     var guest = new Guest();
 
-    guest.Name = Validation.PromptRequired("Enter your first name: ");
+    guest.FirstName = Validation.PromptRequired("Enter your first name: ");
     guest.LastName = Validation.PromptRequired("Enter your last name: ");
     guest.Email = Validation.PromptRequired("Enter your email: ");
     return guest;
@@ -91,9 +91,9 @@ Enter Choice:
   {
     throw new NotImplementedException();
   }
-  public static int GetGuestSearchMethod()
+  public static int GetSearchMethod(string type)
   {
-    Display("Select Search Method");
+    Display($"Selecting {type}, Choose a Search Method");
     Display("1. Email");
     Display("2. Name");
     return (int)Validation.PromptUser4Num("Enter your choice [1-2]: ", 1, 2);
@@ -104,10 +104,10 @@ Enter Choice:
     string ret = "";
     while (!isValid)
     {
-      ret = Validation.ReadRequiredString("Guest name starts with: ");
+      ret = Validation.ReadRequiredString("Name starts with: ");
       if (ret.Contains(","))
       {
-        Display("Forager name cannot contain a comma.");
+        Display("Name cannot contain a comma.");
       }
       else
       {
@@ -125,8 +125,8 @@ Enter Choice:
     }
     int index = 1;
     foreach(Guest guest in guests.Take(25))
-    {
-      Display($"{index++}: {guest.Name}");
+    { 
+      Display($"{index++}: {guest.FirstName} {guest.LastName}");
     }
 
     if(guests.Count > 25)
@@ -150,8 +150,25 @@ Enter Choice:
 
     if(hosts.Count > 25)
     {
-      Display("More than 25 foragers found. Showing first 25. Please refine your search.");
+      Display("More than 25 hosts found. Showing first 25. Please refine your search.");
     }
     Display("0: Exit");
+  }
+
+  public static DateOnly GetDate(string message)
+  {
+    return Validation.PromptUser4Date(message);
+  }
+
+  public static DateOnly EditReservationDate(DateOnly date, string description)
+  {
+    return Validation.PromptUser4Date($"{description} {date}: ");
+  }
+
+  public static void DisplayGreen(string message)
+  {
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(message);
+    Console.ResetColor();
   }
 }

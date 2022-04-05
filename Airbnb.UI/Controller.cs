@@ -66,7 +66,7 @@ public class Controller
 
     private Guest SelectGuest()
     {
-        int choice = View.GetGuestSearchMethod();
+        int choice = View.GetSearchMethod("Guest");
         string NamePrefix = "";
         string email = "";
         Result<Guest> guest = new Result<Guest>();
@@ -151,11 +151,100 @@ public class Controller
     
     private void CancelReservation()
     {
-        throw new NotImplementedException();
+        var newReservation = new Reservation();
+        View.DisplayHeader("Edit Reservation");
+        var guest = SelectGuest();
+        if (guest == null)
+        {
+            View.DisplayRed("No Guest found!");
+            return;
+        }
+        View.DisplayRed(guest.ToString());
+
+        View.LineBreak();
+        var host = SelectHost();
+        if (host == null)
+        {
+            View.DisplayRed("No Host found!");
+            return;
+        }
+        host.ToString();
+        guest.ToString();
+        var reservation = _reservationService.GetReservation(guest.Id,host.Id);
+        Result<Reservation> result = new Result<Reservation>();
+        if (reservation == null)
+        {
+            View.DisplayRed("No Reservation found!");
+            return;
+        }
+        result = _reservationService.DeleteReservation(reservation.Value);
+        if(result.Success)
+        {
+            View.DisplayGreen($"Reservation Cancelled! \n {result.Value}");
+        }
+        else
+        {
+            foreach (var m in result.Messages)
+            {
+                View.DisplayRed(m);
+            }
+        }
     }
     private void EditReservation()
     {
-        throw new NotImplementedException();
+        var newReservation = new Reservation();
+        View.DisplayHeader("Edit Reservation");
+        var guest = SelectGuest();
+        if (guest == null)
+        {
+            View.DisplayRed("No Guest found!");
+            return;
+        }
+        View.DisplayRed(guest.ToString());
+
+        View.LineBreak();
+        var host = SelectHost();
+        if (host == null)
+        {
+            View.DisplayRed("No Host found!");
+            return;
+        }
+        host.ToString();
+        guest.ToString();
+        var reservation = _reservationService.GetReservation(guest.Id,host.Id);
+        if (reservation.Success)
+        {
+            newReservation.startDate = View.EditReservationDate(reservation.Value.startDate, "Start");
+            newReservation.endDate = View.EditReservationDate(reservation.Value.endDate, "End");
+            newReservation.id = reservation.Value.id;
+            newReservation.guest = reservation.Value.guest;
+            newReservation.host = reservation.Value.host;
+            AddUpdatedReservation(newReservation);
+        }
+        else
+        {
+            foreach (var m in reservation.Messages)
+            {
+                View.DisplayRed(m);
+            }
+        }
+    }
+
+    private void AddUpdatedReservation(Reservation newReservation)
+    {
+        Result<Reservation> result = new Result<Reservation>();
+        result = _reservationService.UpdateReservation(newReservation);
+        if (result.Success)
+        {
+            View.DisplayGreen($"Reservation Updated!\n {result.Value}");
+        }
+        else
+        {
+            foreach (var m in result.Messages)
+            {
+                View.DisplayRed(m);
+            }
+        }
     }
 
     private void MakeReservation()
@@ -167,10 +256,7 @@ public class Controller
             View.DisplayRed("No Guest found!");
             return;
         }
-        else
-        {
-            View.DisplayRed(guest.ToString());
-        }
+        View.DisplayRed(guest.ToString());
 
         View.LineBreak();
         var host = SelectHost();
@@ -179,15 +265,31 @@ public class Controller
             View.DisplayRed("No Host found!");
             return;
         }
+        View.DisplayRed(host.ToString());
+        Reservation reservation = new Reservation();
+        reservation.guest = guest;
+        reservation.host = host;
+        ViewReservations(host);
+        reservation.startDate = View.GetDate("Enter Start Date:");
+        reservation.endDate = View.GetDate("Enter End Date:"); 
+        Result<Reservation> result = _reservationService.CreateReservation(reservation);
+        if (result.Success)
+        {
+            View.Display($"{result.Value}");
+            View.LineBreak();
+        }
         else
         {
-            View.DisplayRed(host.ToString());
+            foreach (var m in result.Messages)
+            {
+                View.DisplayRed(m);
+            }
         }
     }
 
     private Host SelectHost()
     {
-        int choice = View.GetGuestSearchMethod();
+        int choice = View.GetSearchMethod("Host");
         string NamePrefix = "";
         string email = "";
         Result<Host> host = new Result<Host>();
@@ -211,8 +313,9 @@ public class Controller
                 else
                 {
                     View.DisplayHosts(hosts);
-                    int index = (int)Validation.PromptUser4Num("Enter guest number:", 1, hosts.Count);
-                    return hosts[index - 1];
+                    int index = (int)Validation.PromptUser4Num("Enter host number:", 1, hosts.Count);
+                    host.Value = hosts[index - 1];
+                    break;
                     // TODO: ***
                     // TODO: POSSIBLE BUG WITH INDEX, MIGHT NEED TO FIX ^^^
                     // TODO: ***
@@ -220,10 +323,50 @@ public class Controller
             default:
                 throw new Exception("Invalid option");
         }
+
+        return host.Value;
+
     }
 
     private void ViewReservations()
     {
-        throw new NotImplementedException();
+        Result<List<Reservation>> result = new Result<List<Reservation>>();
+        Host host = SelectHost();
+        result = _reservationService.GetReservations(host.Id);
+        if (result.Success)
+        {
+            foreach (var reservation in result.Value)
+            {
+                View.Display($"{reservation}");
+                View.LineBreak();
+            }
+        }
+        else
+        {
+            foreach (var m in result.Messages)
+            {
+                View.DisplayRed(m);
+            }
+        }
+    }
+    private void ViewReservations(Host host)
+    {
+        Result<List<Reservation>> result = new Result<List<Reservation>>();
+        result = _reservationService.GetReservations(host.Id);
+        if (result.Success)
+        {
+            foreach (var reservation in result.Value)
+            {
+                View.Display($"{reservation}");
+                View.LineBreak();
+            }
+        }
+        else
+        {
+            foreach (var m in result.Messages)
+            {
+                View.DisplayRed(m);
+            }
+        }
     }
 }   
