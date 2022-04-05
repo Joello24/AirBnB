@@ -129,5 +129,8 @@ User interface testing is not required.
  *
  * TODO: DETERMINE ID TYPES ??? GUEST-INT ID, HOST-GUID ID, RESERVATION-INT ID ???
  * IMPORTANT: RESERVATIONS ARE STORED AS A CSV FILE NAMED BY HOST GUID
+ *
+ * ENTRY: Optional sort by email or name prefix for guests and hosts.
+ * ENTRY: LINQ queries when needed in reservation service. 
  * 
  */

@@ -135,4 +135,23 @@ Enter Choice:
     }
     Display("0: Exit");
   }
+
+  public static void DisplayHosts(List<Host> hosts)
+  {
+    if(hosts == null || hosts.Count == 0)
+    {
+      Display("No hosts found");
+    }
+    int index = 1;
+    foreach(Host host in hosts.Take(25))
+    {
+      Display($"{index++}: {host.LastName}");
+    }
+
+    if(hosts.Count > 25)
+    {
+      Display("More than 25 foragers found. Showing first 25. Please refine your search.");
+    }
+    Display("0: Exit");
+  }
 }

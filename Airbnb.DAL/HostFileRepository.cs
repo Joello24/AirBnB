@@ -8,6 +8,7 @@ public class HostFileRepository : IHostRepo
 {
     private string  _filePath;
     private ILogger _logger;
+    private const string HEADER = "id,last_name,email,phone,address,city,state,postal_code,standard_rate,weekend_rate";
     
     public HostFileRepository(string filePath, ILogger logger)
     {
@@ -45,40 +46,25 @@ public class HostFileRepository : IHostRepo
         result.Value = hosts;
         return result;
     }
-
     private Host DeserializeHost(string[] columns)
     {
         Host host = new Host();
         host.Id = columns[0];
-        host.Email = columns[1];
-        host.City = columns[2];
-        host.Name = columns[3];
-        if (columns[4].Contains("$"))
-        {
-            host.weekdayRate = decimal.Parse(columns[4].Replace("$", ""));
-        }
-        else
-        {
-            host.weekdayRate = decimal.Parse(columns[4]);
-        }
-        if(columns[5].Contains("$"))    
-        {
-            host.weekendRate = decimal.Parse(columns[5].Replace("$", ""));
-        }
-        else
-        {
-            host.weekendRate = decimal.Parse(columns[5]);
-        }
+        host.LastName = columns[1];
+        host.Email = columns[2];
+        host.Phone = columns[3];
+        host.Address = columns[4];
+        host.City = columns[5];
+        host.State = columns[6];
+        host.PostalCode = int.Parse(columns[7]);
+        host.weekdayRate = decimal.Parse(columns[8].Contains("$") ? columns[8].Replace("$", "") : columns[8]);
+        host.weekendRate = decimal.Parse(columns[9].Contains("$") ? columns[9].Replace("$", "") : columns[9]);
         return host;
     }
     private string SerializeGuest(Host host)
-    {
-        return string.Format("{0},{1},{2},{3:C},{4:C}",
-            host.Id,
-            host.Name,
-            host.Email,
-            host.weekdayRate,
-            host.weekendRate);
+    {   
+        return
+            $"{host.Id},{host.LastName},{host.Email},{host.Phone},{host.Address},{host.City},{host.State},{host.PostalCode},{host.weekdayRate},{host.weekendRate}";
     }
     public Result<Host> FindByEmail(string email)
     {
@@ -116,6 +102,8 @@ public class HostFileRepository : IHostRepo
                 { 
                     return;
                 }
+                
+                file.WriteLine(HEADER);
                 foreach (var host in hosts)
                 {
                     file.WriteLine(SerializeGuest(host));

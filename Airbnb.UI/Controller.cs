@@ -113,7 +113,8 @@ public class Controller
         {
             foreach (var host in result.Value)
             {
-                View.Display($"{host.Id.ToString()}: {host.Name} - {host.Email} - {host.City} - {host.weekdayRate:C} - {host.weekendRate:C}");                View.LineBreak();
+                View.Display($"{host}");
+                View.LineBreak();
             }
         }
         else
@@ -133,11 +134,12 @@ public class Controller
     private void ViewAllGuests()
     {
         Result<List<Guest>> result = _guestService.GetAll();
+        
         if (result.Success)
         {
             foreach (var guest in result.Value)
             {
-                View.Display($"{guest.Id.ToString()}: {guest.Name} - {guest.Email}");
+                View.Display($"{guest}");
                 View.LineBreak();
             }
         }
@@ -155,10 +157,71 @@ public class Controller
     {
         throw new NotImplementedException();
     }
+
     private void MakeReservation()
     {
-        throw new NotImplementedException();
+        View.DisplayHeader("Make Reservation");
+        var guest = SelectGuest();
+        if (guest == null)
+        {
+            View.DisplayRed("No Guest found!");
+            return;
+        }
+        else
+        {
+            View.DisplayRed(guest.ToString());
+        }
+
+        View.LineBreak();
+        var host = SelectHost();
+        if (host == null)
+        {
+            View.DisplayRed("No Host found!");
+            return;
+        }
+        else
+        {
+            View.DisplayRed(host.ToString());
+        }
     }
+
+    private Host SelectHost()
+    {
+        int choice = View.GetGuestSearchMethod();
+        string NamePrefix = "";
+        string email = "";
+        Result<Host> host = new Result<Host>();
+        List<Host> hosts = new List<Host>();
+        switch (choice)
+        {
+            case 1:
+                email = Validation.ReadRequiredString("Enter Email:");
+                host = _hostService.FindByEmail(email);
+                return host.Value;
+                break;
+                    
+            case 2:
+                NamePrefix = View.GetNamePrefix();
+                hosts = _hostService.FindByNameSearch(NamePrefix);
+                if (hosts.Count == 0)
+                {
+                    View.DisplayRed("No Guests found!");
+                    return null;
+                }
+                else
+                {
+                    View.DisplayHosts(hosts);
+                    int index = (int)Validation.PromptUser4Num("Enter guest number:", 1, hosts.Count);
+                    return hosts[index - 1];
+                    // TODO: ***
+                    // TODO: POSSIBLE BUG WITH INDEX, MIGHT NEED TO FIX ^^^
+                    // TODO: ***
+                }
+            default:
+                throw new Exception("Invalid option");
+        }
+    }
+
     private void ViewReservations()
     {
         throw new NotImplementedException();

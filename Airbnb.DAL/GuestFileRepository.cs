@@ -10,6 +10,7 @@ public class GuestFileRepository : IGuestRepo
 {
     private readonly string  _filePath;
     private ILogger _logger;
+    private const string HEADER = "guest_id,first_name,last_name,email,phone,state";
 
     public GuestFileRepository(string filePath, ILogger logger)
     {
@@ -108,10 +109,7 @@ public class GuestFileRepository : IGuestRepo
 
     private string SerializeGuest(Guest guest)
     {
-        return string.Format("{0},{1},{2},{3}",
-            guest.Id,
-            guest.Name,
-            guest.Email);
+        return $"{guest.Id},{guest.FirstName},{guest.LastName},{guest.Email},{guest.Phone},{guest.State}";
     }
 
     public Result<Guest> Update(Guest guest)
@@ -153,16 +151,19 @@ public class GuestFileRepository : IGuestRepo
     }
     private Guest DeserializeGuest(string[] columns)
     {
-        // id,first,last, email
         Guest guest = new Guest();
-        if (columns.Length != 3)
+        if (columns.Length != 6)
         {
             _logger.Log("Invalid guest record");
             return null;
         }
+        
         guest.Id = int.Parse(columns[0]);
-        guest.Name = columns[1];
-        guest.Email = columns[2];
+        guest.FirstName = columns[1];
+        guest.LastName = columns[2];
+        guest.Email = columns[3];
+        guest.Phone = columns[4];
+        guest.State = columns[5];
         return guest;
     }
 }

@@ -24,7 +24,10 @@ public class HostService
         var result = _hostRepo.FindByEmail(email);
         return result;
     }
-    
 
 
+    public List<Host> FindByNameSearch(string namePrefix)
+    {
+        return _hostRepo.FindAll().Value.Where(x => x.LastName.StartsWith(namePrefix)).ToList();
+    }
 }
