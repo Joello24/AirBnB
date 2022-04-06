@@ -177,6 +177,7 @@ public class ReservationTests
         
         //Act
         var actual = repo.GetReservationsByHost(host.Id).Value;
+        
         //Assert
         Assert.AreEqual(13, actual.Count);
         Assert.AreEqual(expected[0].id, actual[0].id);
@@ -201,6 +202,7 @@ public class ReservationTests
         //Act
         var actual = repo.CreateReservation(expected).Value;
         var actual2 = repo.GetReservation(expected.guest.Id, expected.host.Id).Value;
+        
         //Assert
         Assert.AreEqual(expected.id, actual.id);
         Assert.AreEqual(expected.id, actual2.id);
@@ -209,12 +211,22 @@ public class ReservationTests
     [Test]
     public void UpdateReservation()
     {
+        //Arrange
+        Reservation expected = new Reservation();
+        Guest guest = new Guest();
+        guest.Id = 899;
+        Host host = new Host();
+        host.Id = "582de161-b2eb-4ea6-8f28-b2e4be5f5ca0";
+        expected.guest = guest;
+        expected.host = host;
         
-    }
-    //DeleteReservation
-    [Test]
-    public void DeleteReservation()
-    {
+        //Act
+        repo.CreateReservation(expected);
+        expected.totalPrice = 1022.50m;
+        var actual = repo.UpdateReservation(expected).Value;
         
+        //Assert
+        Assert.AreEqual(expected.totalPrice, actual.totalPrice);
+        Assert.AreEqual(1022.50m, actual.totalPrice);
     }
 }
