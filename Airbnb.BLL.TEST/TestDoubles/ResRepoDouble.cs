@@ -12,7 +12,7 @@ public class ResRepoDouble : IReservationRepo
     public ResRepoDouble()
     {
         Reservation res1 = new Reservation();
-        res1.id = 1;
+        res1.id = 50;
         res1.startDate = new DateOnly(2019, 1, 1);
         res1.endDate = new DateOnly(2019, 1, 2);
         res1.guest = GuestRepoDouble.Guest1;
@@ -20,7 +20,7 @@ public class ResRepoDouble : IReservationRepo
         _reservations.Add(res1);
         
         Reservation res2 = new Reservation();
-        res2.id = 3;
+        res2.id = 2;
         res2.startDate = new DateOnly(2019, 1, 1);
         res2.endDate = new DateOnly(2019, 1, 2);
         res2.guest = GuestRepoDouble.Guest2;
@@ -38,15 +38,13 @@ public class ResRepoDouble : IReservationRepo
 
     public Result<Reservation> GetReservation(int id, string hostId)
     {
-        Result<Reservation> result = new Result<Reservation>();
+        var result = _reservations.Find(r => r.id == id && r.host.Id == hostId);
         
-        result.Value = _reservations.Find(r => r.id == id && r.host.Id == hostId);
-        if (result.Value == null)
+        return new Result<Reservation>()
         {
-            result.AddMessage("Cant find");
-        }
-
-        return result;
+            Value = result
+        };
+        
     }
 
     public Result<List<Reservation>> GetReservationsByHost(string hostId)

@@ -9,16 +9,16 @@ public class HostRepoDouble : IHostRepo
     public static readonly List<Host> Hosts = new List<Host>();
     public static readonly Host Host1 = new Host()
     {
-        Id = "fakeid1",
-        LastName = "Smith",
-        Email = "fakeemail1.com",
-        Phone = "1234567890",
-        Address = "123 Fake St",
-        City = "Fakeville",
-        State = "CA",
-        PostalCode = 12345,
-        weekdayRate = 100,
-        weekendRate = 50
+        Id = "2e72f86c-b8fe-4265-b4f1-304dea8762db",
+        LastName = "de Clerk",
+        Email = "kdeclerkdc@sitemeter.com",
+        Phone = "(208) 9496329",
+        Address = "2 Debra Way",
+        City = "Boise",
+        State = "ID",
+        PostalCode = 83757,
+        weekdayRate = 200m,
+        weekendRate = 250m
     };
     public static readonly Host Host2 = new Host()
     {
