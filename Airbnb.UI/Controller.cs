@@ -34,7 +34,6 @@ public class Controller
     private void RunAppLoop()
     {
         MainMenuOption option;
-        
         do
         {
             option = (MainMenuOption)View.GetMainChoice();
@@ -58,7 +57,7 @@ public class Controller
         } while(option != MainMenuOption.Exit);
     }
 
-    private Guest SelectGuest()
+    private Result<Guest> SelectGuest()
     {
         int choice = View.GetSearchMethod("Guest");
         string NamePrefix = "";
@@ -68,78 +67,15 @@ public class Controller
         switch (choice)
         {
             case 1:
-                email = Validation.ReadRequiredString("Enter Email:");
-                guest = _guestService.FindByEmail(email);
-                return guest.Value;
+                guest = SearchGuestByEmail();
+                return guest;
                 break;
                     
             case 2:
-                NamePrefix = View.GetNamePrefix();
-                guests = _guestService.FindByNameSearch(NamePrefix);
-                if (guests.Count == 0)
-                {
-                    View.DisplayRed("No Guests found!");
-                    return null;
-                }
-                else
-                {
-                    View.DisplayGuests(guests);
-                    int index = (int)Validation.PromptUser4Num("Enter guest number:", 1, guests.Count);
-                    return guests[index - 1];
-                    // TODO: ***
-                    // TODO: POSSIBLE BUG WITH INDEX, MIGHT NEED TO FIX ^^^
-                    // TODO: ***
-                }
+                guest = SearchGuestByName();
+                return guest;
             default:
                 throw new Exception("Invalid option");
-        }
-    }
-
-    private void FindGuestsByPrefixSearch()
-    {
-        List<Guest> guests = _guestService.FindByNameSearch(View.GetGuestPrefix());
-    }
-
-    private void ViewHosts()
-    {
-        Result<List<Host>> result = _hostService.FindAll();
-        if (result.Success)
-        {
-            foreach (var host in result.Value)
-            {
-                View.Display($"{host}");
-                View.LineBreak();
-            }
-        }
-        else
-        {
-            View.DisplayRed(result.Messages.ToString());
-        }   
-    }
-
-    private void UpdateGuest()
-    {
-        ViewAllGuests();
-        int selection = (int)Validation.PromptUser4Num("Enter ID of guest to update: ");
-        // get new info for guest.
-        //_guestService.Update(guest.id, guest);
-    }
-
-    private void ViewAllGuests()
-    {
-        Result<List<Guest>> result = _guestService.GetAll();
-        
-        if (result.Success)
-        {
-            foreach (var guest in result.Value)
-            {
-                View.Display($"{guest}");
-                View.LineBreak();
-            }
-        }
-        else
-        {
-            View.DisplayRed(result.Messages.ToString());
         }
     }
     
@@ -147,24 +83,9 @@ public class Controller
     {
         var newReservation = new Reservation();
         View.DisplayHeader("Edit Reservation");
-        var guest = SelectGuest();
-        if (guest == null)
-        {
-            View.DisplayRed("No Guest found!");
-            return;
-        }
-        View.DisplayRed(guest.ToString());
-
-        View.LineBreak();
-        int choice = View.GetSearchMethod("Host");
-        var host = SelectHost(choice);
-        if (host == null)
-        {
-            View.DisplayRed("No Host found!");
-            return;
-        }
-        host.ToString();
-        guest.ToString();
+        var guest = GrabGuest();
+        var host = GrabHost();
+        
         var reservation = _reservationService.GetReservation(guest.Id,host.Id);
         Result<Reservation> result = new Result<Reservation>();
         if (reservation == null)
@@ -173,39 +94,69 @@ public class Controller
             return;
         }
         result = _reservationService.DeleteReservation(reservation.Value);
-        if(result.Success)
-        {
-            View.DisplayGreen($"Reservation Cancelled! \n {result.Value}");
-        }
-        else
-        {
-            foreach (var m in result.Messages)
-            {
-                View.DisplayRed(m);
-            }
-        }
+        View.HandleSingleResult(result);
     }
+
+    private Host GrabHost()
+    {
+        bool grabbing = true;
+        Result<Host> host = new Result<Host>();
+        while (grabbing)
+        {
+            host = SelectHost();
+            if (!host.Success)
+                View.DisplayResultMessages(host.Messages);
+            
+            else
+                grabbing = false;
+        }
+    
+        View.DisplayGreen(host.Value.ToString());
+        View.LineBreak();
+        return host.Value;
+    }
+    private Guest GrabGuest()
+    {
+        bool grabbing = true;
+        Result<Guest> guest = new Result<Guest>();
+        while (grabbing)
+        {
+            guest = SelectGuest();
+            if (!guest.Success)
+                View.DisplayResultMessages(guest.Messages);
+            
+            else
+                grabbing = false;
+        }
+    
+        View.DisplayGreen(guest.Value.ToString());
+        View.LineBreak();
+        return guest.Value;
+    }
+
     private void EditReservation()
     {
         var newReservation = new Reservation();
         View.DisplayHeader("Edit Reservation");
         var guest = SelectGuest();
-        if (guest == null)
+        if (!guest.Success)
         {
+            View.DisplayResultMessages(guest.Messages);
             return;
         }
-        View.DisplayRed(guest.ToString());
+        
+        View.DisplayGreen(guest.ToString());
 
         View.LineBreak();
-        int choice = View.GetSearchMethod("Host");
-        var host = SelectHost(choice);
+        
+        var host = SelectHost();
         if (host == null)
         {
             return;
         }
-        host.ToString();
-        guest.ToString();
-        var reservation = _reservationService.GetReservation(guest.Id,host.Id);
+        host.Value.ToString();
+        guest.Value.ToString();
+        var reservation = _reservationService.GetReservation(guest.Value.Id,host.Value.Id);
         if (reservation.Success)
         {
             newReservation.startDate = View.EditReservationDate(reservation.Value.startDate, "Start");
@@ -228,173 +179,134 @@ public class Controller
     {
         Result<Reservation> result = new Result<Reservation>();
         result = _reservationService.UpdateReservation(newReservation);
-        if (result.Success)
-        {
-            View.DisplayGreen($"Reservation Updated!\n {result.Value}");
-        }
-        else
-        {
-            foreach (var m in result.Messages)
-            {
-                View.DisplayRed(m);
-            }
-        }
+        View.HandleSingleResult(result, "Update Successful!");
     }
 
     private void MakeReservation()
     {
         View.DisplayHeader("Make Reservation");
         var guest = SelectGuest();
-        if (guest == null)
+        if (!guest.Success)
         {
+            View.DisplayResultMessages(guest.Messages);
             return;
         }
-        View.DisplayRed(guest.ToString());
-
+        View.Display("Guest found!");
+        View.DisplayGreen(guest.Value.ToString());
+        
         View.LineBreak();
-        int choice = View.GetSearchMethod("Host");
-        var host = SelectHost(choice);
-        if (host == null)
+        
+        var host = SelectHost();
+        if (!host.Success)
         {
             return;
         }
-        View.DisplayRed(host.ToString());
+        View.DisplayGreen(host.Value.ToString());
         Reservation reservation = new Reservation();
-        reservation.guest = guest;
-        reservation.host = host;
-        ViewReservations(host);
+        reservation.guest = guest.Value;
+        reservation.host = host.Value;
+        
+        ViewReservations(host.Value);
         reservation.startDate = View.GetDate("Enter Start Date:");
         reservation.endDate = View.GetDate("Enter End Date:"); 
+        
         Result<Reservation> result = _reservationService.CreateReservation(reservation);
-        if (result.Success)
-        {
-            View.Display($"{result.Value}");
-            View.LineBreak();
-        }
-        else
-        {
-            foreach (var m in result.Messages)
-            {
-                View.DisplayRed(m);
-            }
-        }
+        //View.HandleSingleResult(result, "Reservation Created!");
+        result.Value.Print();
     }
-    
-    private Host SelectHost(int Choice)
+
+    private Result<Host> SelectHost()
     {
-        int choice = Choice;
+        int choice = View.GetSearchMethod("Host");
         Result<Host> host = new Result<Host>();
         List<Host> hosts = new List<Host>();
         switch (choice)
         {
             case 1:
-                host.Value = SearchByEmail();
-                return host.Value;
+                host = SearchHostByEmail();
+                return host;
                 break;
                     
             case 2:
-                host.Value = SearchByName();
-                return host.Value;
+                host = SearchHostByName();
+                return host;
             default:
                 throw new Exception("Invalid option");
         }
     }
 
-    private Host SearchByName()
+    private Result<Host> SearchHostByName()
     {
         string NamePrefix = "";
         List<Host> hosts = new List<Host>();
-        Host host = new Host();
+        Result<Host> host = new Result<Host>();
         NamePrefix = View.GetNamePrefix();
         hosts = _hostService.FindByNameSearch(NamePrefix);
         if (hosts.Count == 0)
         {
-            View.DisplayRed("No Guests found!");
-            return null;
+            host.AddMessage("No hosts found!");
+            return host;
         }
-        
         hosts = _reservationService.PopulateHostReservations(hosts).Value;
         View.DisplayHosts(hosts);
         int index = (int)Validation.PromptUser4Num("Enter host number:", 1, hosts.Count);
-        host = hosts[index - 1];
+        host.Value = hosts[index - 1];
         return host;
-        
+    }
+    private Result<Guest> SearchGuestByName()
+    {
+        string NamePrefix = "";
+        List<Guest> guests = new List<Guest>();
+        Result<Guest> guest = new Result<Guest>();
+        NamePrefix = View.GetNamePrefix();
+        guests = _guestService.FindByNameSearch(NamePrefix);
+        if (guests.Count == 0)
+        {
+            guest.AddMessage("No guests found!");
+            return guest;
+        }
+        View.DisplayGuests(guests);
+        int index = (int)Validation.PromptUser4Num("Enter guest number:", 1, guests.Count);
+        guest.Value = guests[index - 1];
+        return guest;
     }
 
-    private Host SearchByEmail()
+    private Result<Host> SearchHostByEmail()
     {
         string email = "";
         Result<Host> host = new Result<Host>();
         email = Validation.ReadRequiredString("Enter Email:");
         host = _hostService.FindByEmail(email);
-        if (host.Success)
-        {
-            return host.Value;
-        }
-        else
-        {
-            foreach (var m in host.Messages)
-            {
-                View.DisplayRed(m);
-            }
-            return null;
-        }
+        return host;
+    }
+    private Result<Guest> SearchGuestByEmail()
+    {
+        string email = "";
+        Result<Guest> guest = new Result<Guest>();
+        email = Validation.ReadRequiredString("Enter Email:");
+        guest = _guestService.FindByEmail(email);
+        return guest;
     }
 
     private void ViewReservations()
     {
         Result<List<Reservation>> result = new Result<List<Reservation>>();
-        int choice = View.GetSearchMethod("Host");
-        Host host = SelectHost(choice);
-        if (host == null)
-            return;
+        Result<Host> host = SelectHost();
         
-        result = _reservationService.GetReservations(host.Id);
-        if (result.Success)
+        if (!host.Success)
         {
-            foreach (var reservation in result.Value)
-            {
-                View.Display($"{reservation}");
-                View.LineBreak();
-            }
+            View.DisplayResultMessages(host.Messages);
+            return;
         }
-        else
-        {
-            foreach (var m in result.Messages)
-            {
-                View.DisplayRed(m);
-            }
-        }
-    }
 
-    // private Host GetHost()
-    // {
-    //     
-    // }
-    //
-    // private Guest GetGuest()
-    // {
-    //     
-    // }
+        result = _reservationService.GetReservations(host.Value.Id);
+        View.HandleListResult(result);
+    }
 
     private void ViewReservations(Host host)
     {
         Result<List<Reservation>> result = new Result<List<Reservation>>();
         result = _reservationService.GetReservations(host.Id);
-        if (result.Success)
-        {
-            foreach (var reservation in result.Value)
-            {
-                View.Display($"{reservation}");
-                View.LineBreak();
-            }
-        }
-        else
-        {
-            foreach (var m in result.Messages)
-            {
-                View.DisplayRed(m);
-            }
-        }
+        View.HandleListResult(result);
     }
 }   

@@ -17,6 +17,7 @@ public class ReservationService
 
     public Result<Reservation> CreateReservation(Reservation reservation)
     {
+        reservation.host = PopulateHostReservations(reservation.host);
         Result<Reservation> result = Validate(reservation);
         if (!result.Success)
         {
@@ -51,6 +52,19 @@ public class ReservationService
         }
         result.Value = hosts;
         return result;
+    }
+    public Host PopulateHostReservations(Host host)
+    {
+        Result<Host> result = new Result<Host>();
+        
+        var hold = _reservationRepository.GetReservationsByHost(host.Id);
+        if (hold.Success)
+        {
+            host.Reservations = hold.Value;
+        }
+
+        result.Value = host;
+        return result.Value;
     }
 
     public Result<Reservation> DeleteReservation(Reservation res)
@@ -123,7 +137,6 @@ public class ReservationService
         }
         return res;
     }
-    //VALIDATION HERE
 
     private List<Reservation> BuildReservationData(List<Reservation> res)
     {
@@ -235,9 +248,17 @@ public class ReservationService
         {
             return;
         }
-        else if(reservation.host.Reservations.Distinct().Any(r => r.startDate < reservation.startDate && r.endDate > reservation.startDate))
+        else if(reservation.host.Reservations.Any(r => r.startDate <= reservation.startDate && r.endDate >= reservation.startDate))
         {
-            result.AddMessage("Host is already booked for this date");
+            result.AddMessage("Host is already booked for that time");
+        }
+        else if (reservation.host.Reservations.Any(r => r.startDate <= reservation.endDate && r.endDate >= reservation.endDate))
+        {
+            result.AddMessage("Host is already booked for that time");
+        }
+        else if (reservation.host.Reservations.Any(r => r.startDate >= reservation.startDate && r.endDate <= reservation.endDate))
+        {
+            result.AddMessage("Host is already booked for that time");
         }
     }
     private void ValidateDuplicates(Reservation reservation, Result<Reservation> result)

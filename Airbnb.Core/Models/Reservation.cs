@@ -12,6 +12,26 @@ public class Reservation
     
     public override string ToString()
     {
-        return $"{id}-{startDate}-{endDate}\n Guest: {guest} \n Host: {host} \n Total:{totalPrice:C}";
+        return 
+               $"Reservation: {id}-{startDate}-{endDate}\n" + 
+               $"Guest: {guest}\n" +
+               $"Host: {host}\n" +
+               $"\nTotal:{totalPrice:C}";
+    }
+    public void Print()
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine($"\n***Reservation***\n#{id} for host {host.Id}");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"From {startDate} to {endDate}");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"***GUEST***");
+        Console.WriteLine($"{guest}");
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine($"***HOST***");
+        Console.WriteLine($"{host}");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Total: {totalPrice:C}\n");
+        Console.ResetColor();
     }
 }

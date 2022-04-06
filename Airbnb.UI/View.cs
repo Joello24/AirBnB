@@ -40,22 +40,26 @@ public static class View
     return (int)Validation.PromptUser4Num(@"What mode would you like to run in?
 1. Live
 2. Test
-Select mode: 
-", 1, 2);
+Select mode: ", 1, 2);
   }
 
   internal static int GetMainChoice()
   {
     DisplayHeader("Main Menu");
 
-    return (int)Validation.PromptUser4Num(@"
+    return (int)Validation.PromptUser4Num($@"
 0. Exit
 1. View Reservations for Host
 2. Make a Reservation
 3. Edit a Reservation
 4. Cancel a Reservation
-Enter Choice: 
-", 0, 6);
+Enter Choice: ", 0, 6);
+  }
+
+  public static void Tilde()
+  {
+    Console.ForegroundColor = ConsoleColor.Green;
+    DisplayInLine("~ ");
   }
 
   public static Guest GetGuest()
@@ -129,9 +133,8 @@ Enter Choice:
 
     if(guests.Count > 25)
     {
-      Display("More than 25 foragers found. Showing first 25. Please refine your search.");
+      Display("More than 25 guests found. Showing first 25. Please refine your search.");
     }
-    Display("0: Exit");
   }
 
   public static void DisplayHosts(List<Host> hosts)
@@ -152,7 +155,6 @@ Enter Choice:
     {
       Display("More than 25 hosts found. Showing first 25. Please refine your search.");
     }
-    Display("0: Exit");
   }
 
   public static DateOnly GetDate(string message)
@@ -171,4 +173,76 @@ Enter Choice:
     Console.WriteLine(message);
     Console.ResetColor();
   }
+
+  public static void DisplayResultMessages(List<string> resultMessages)
+  {
+    foreach (var m in resultMessages)
+    {
+      DisplayRed(m);
+    }
+  }
+  public static void HandleListResult(Result<List<Reservation>> result)
+  {
+    if (result.Success)
+    {
+      foreach (var i in result.Value)
+      {
+        if (i.GetType() == typeof(Reservation))
+        {
+          i.Print();
+        }
+        else
+        {
+          View.Display($"{i}");
+          View.LineBreak();
+        }
+      }
+    }
+    else
+    {
+      View.DisplayResultMessages(result.Messages);
+    }
+  }
+  public static void HandleListResult(Result<List<Reservation>> result, string successMessage)
+  {
+    if (result.Success)
+    {
+      DisplayGreen(successMessage);
+      foreach (var reservation in result.Value)
+      {
+        View.Display($"{reservation}");
+        View.LineBreak();
+      }
+    }
+    else
+    {
+      View.DisplayResultMessages(result.Messages);
+    }
+  }
+  public static void HandleSingleResult(Result<Reservation> result, string successMessage)
+  {
+    if (result.Success)
+    {
+      DisplayGreen(successMessage);
+      View.Display($"{result.Value}");
+      View.LineBreak();
+    }
+    else
+    {
+      View.DisplayResultMessages(result.Messages);
+    }
+  }
+  public static void HandleSingleResult(Result<Reservation> result)
+  {
+    if (result.Success)
+    {
+      View.Display($"{result.Value}");
+      View.LineBreak();
+    }
+    else
+    {
+      View.DisplayResultMessages(result.Messages);
+    }
+  }
+  
 }

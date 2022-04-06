@@ -18,7 +18,7 @@ public class Host
 
     public override string ToString()
     {
-        string ret = $"{Id}: {Email}-{LastName}\nAddress:{Address}, {City} {State}, {PostalCode}.\n Rates: {weekdayRate}-{weekendRate}";
+        string ret = $"ID: {Id}:\nEmail: {Email}\nLastname: {LastName}\nAddress: {Address}, {City} {State}, {PostalCode}.\nStandard Rate: {weekdayRate:C}, Weekend Rate: {weekendRate:C}";
         return ret;
     }
 }

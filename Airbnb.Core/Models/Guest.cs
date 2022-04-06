@@ -11,7 +11,7 @@ public class Guest
 
     public override string ToString()
     {
-        string ret = $"{Id}: {FirstName} {LastName}-{Email}-{Phone}-{State}";
+        string ret = $"ID: {Id}, Name: {FirstName} {LastName}, Email: {Email}, Phone: {Phone}, State: {State}";
         return ret;
     }
 }

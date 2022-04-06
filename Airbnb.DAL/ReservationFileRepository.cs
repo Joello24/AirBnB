@@ -54,10 +54,10 @@ public class ReservationFileRepository : IReservationRepo
         var path = Path.Combine(_dirPath, hostId + ".csv");
         if (!File.Exists(path))
         {
-            result.AddMessage("File not found");
+            result.AddMessage("Host currently has no reservations.");
             return result;
         }
-
+        
         string[] lines = null;
         try
         {
@@ -102,17 +102,23 @@ public class ReservationFileRepository : IReservationRepo
     
     public Result<Reservation> CreateReservation(Reservation reservation)
     {
+        int nextId = 0;
         Result<Reservation> result = new Result<Reservation>();
         var path = Path.Combine(_dirPath, reservation.host.Id + ".csv");
         Result<List<Reservation>> current = GetReservationsByHost(reservation.host.Id);
+        
+        
         if (!current.Success && !File.Exists(path))
         {
             List<Reservation> newResFile = new List<Reservation>();
+            reservation.id = nextId;
             newResFile.Add(reservation);
             Write(newResFile);
             result.Value = reservation;
             return result;
         }
+        nextId = (current.Value.Count == 0 ? 0 : current.Value.Max(i => i.id)) + 1;
+        reservation.id = nextId;
         current.Value.Add(reservation);
         Write(current.Value);
         result.Value = reservation;
