@@ -37,6 +37,21 @@ public class ReservationService
         }
         return result;
     }
+    
+    public Result<List<Host>> PopulateHostReservations(List<Host> hosts)
+    {
+        Result<List<Host>> result = new Result<List<Host>>();
+        foreach (var host in hosts)
+        {
+            var hold = _reservationRepository.GetReservationsByHost(host.Id);
+            if (hold.Success)
+            {
+                host.Reservations = hold.Value;
+            }
+        }
+        result.Value = hosts;
+        return result;
+    }
 
     public Result<Reservation> DeleteReservation(Reservation res)
     {
@@ -79,9 +94,13 @@ public class ReservationService
     public Result<Reservation> GetReservation(int id, string hostId)
     {
         Result<Reservation> result = new Result<Reservation>();
-        var res = _reservationRepository.GetReservation(id, hostId).Value;
-        result.Value = BuildReservationData(res);
-        
+        var res = _reservationRepository.GetReservation(id, hostId);
+        if (!res.Success)
+        {
+            result = res;
+            return result;
+        }
+        result.Value = BuildReservationData(res.Value);
         return result;
     }
 
@@ -130,9 +149,14 @@ public class ReservationService
         }
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
         Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
+
+        Result<Reservation> hold = ValidateNulls(res);
+        if (!hold.Success)
+        {
+            return null;
+        } 
         
         Reservation buildRes = _reservationRepository.GetReservation(res.guest.Id, res.host.Id).Value;
-
         buildRes.guest = guests[buildRes.guest.Id];
         buildRes.host = hosts[buildRes.host.Id];
         buildRes.totalPrice = CalculateTotalCost(buildRes.host.weekdayRate,buildRes.host.weekendRate, buildRes.startDate, buildRes.endDate);

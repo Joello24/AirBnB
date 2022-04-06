@@ -94,9 +94,9 @@ public class ReservationFileRepository : IReservationRepo
         ret.endDate = DateOnly.Parse(columns[2]);
         guest.Id = int.Parse(columns[3]);
         ret.totalPrice = decimal.Parse(columns[4]);
-        
         ret.guest = guest;
         ret.host = host;
+        
         return ret;
     }
     

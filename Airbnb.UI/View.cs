@@ -54,8 +54,6 @@ Select mode:
 2. Make a Reservation
 3. Edit a Reservation
 4. Cancel a Reservation
-5. View Guests
-6. View Hosts
 Enter Choice: 
 ", 0, 6);
   }
@@ -143,9 +141,11 @@ Enter Choice:
       Display("No hosts found");
     }
     int index = 1;
+    string filePopIndicator = "";
     foreach(Host host in hosts.Take(25))
     {
-      Display($"{index++}: {host.LastName}");
+      filePopIndicator = host.Reservations == null ? "Empty" : host.Reservations.Count.ToString() + " Reservations";
+      Display($"{index++}: {host.LastName}- {filePopIndicator}");
     }
 
     if(hosts.Count > 25)
