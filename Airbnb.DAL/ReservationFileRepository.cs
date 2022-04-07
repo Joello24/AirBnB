@@ -217,7 +217,7 @@ public class ReservationFileRepository : IReservationRepo
         {
             Write(reservations);
         }
-        result.Value = res;
+        result.Value = reservation;
         return result;
     }
 }

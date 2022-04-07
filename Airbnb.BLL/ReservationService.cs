@@ -17,7 +17,7 @@ public class ReservationService
 
     public Result<Reservation> CreateReservation(Reservation reservation)
     {
-        reservation.host = PopulateHostReservations(reservation.host);
+        //reservation.host = PopulateHostReservations(reservation.host);
         Result<Reservation> result = Validate(reservation);
         if (!result.Success)
         {
@@ -28,7 +28,6 @@ public class ReservationService
         result = hold;
         return result;
     }
-    
     public Result<List<Host>> PopulateHostReservations(List<Host> hosts)
     {
         Result<List<Host>> result = new Result<List<Host>>();
@@ -56,7 +55,6 @@ public class ReservationService
         result.Value = host;
         return result.Value;
     }
-
     public Result<Reservation> DeleteReservation(Reservation res)
     {
         Result<Reservation> result = Validate(res);
@@ -64,11 +62,11 @@ public class ReservationService
         {
             return result;
         }
-        // TODO: Consider moving BuildReservationData() call to controller
+        // TODO: return populated reservation into hold
         var hold = _reservationRepository.DeleteReservation(res);
         if (hold.Success)
         {
-            result.Value = BuildReservationData(hold.Value);
+            result.Value = hold.Value;
         }
         else
         {
@@ -76,7 +74,6 @@ public class ReservationService
         }
         return result;
     }
-
     public Result<Reservation> UpdateReservation(Reservation reservation, Reservation oldReservation)
     {
         Result<Reservation> result = ValidateEdit(reservation, oldReservation);
@@ -96,7 +93,6 @@ public class ReservationService
         }
         return result;
     }
-
     public Result<Reservation> GetReservation(int id, string hostId)
     {
         Result<Reservation> result = new Result<Reservation>();
@@ -123,7 +119,6 @@ public class ReservationService
         result.Value = BuildReservationData(res.Value);
         return result;
     }
-
     public Result<List<Reservation>> GetReservations(string hostId)
     { 
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
@@ -143,7 +138,6 @@ public class ReservationService
         }
         return res;
     }
-
     public List<Reservation> BuildReservationData(List<Reservation> res)
     {
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
@@ -181,7 +175,6 @@ public class ReservationService
         buildRes.totalPrice = CalculateTotalCost(buildRes.host.weekdayRate,buildRes.host.weekendRate, buildRes.startDate, buildRes.endDate);
         return buildRes;
     }
-    
     private decimal CalculateTotalCost(decimal weekdayRate, decimal weekendRate, DateOnly startDate, DateOnly endDate)
     {
         decimal totalCost = 0;
@@ -226,7 +219,6 @@ public class ReservationService
         }
         reservation.totalPrice = totalCost;
     }
-
     private Result<Reservation> Validate(Reservation reservation)
     {
         Result<Reservation> result = ValidateNulls(reservation);
@@ -273,7 +265,6 @@ public class ReservationService
 
         return result;
     }
-
     private void ValidateChildrenExist(Reservation reservation, Result<Reservation> result)
     {
         if (_guestRepository.FindAll().Value.FirstOrDefault(g => g.Id == reservation.guest.Id) == null)
@@ -286,7 +277,6 @@ public class ReservationService
             result.AddMessage("Host does not exist");
         }
     }
-
     private void ValidateFields(Reservation reservation, Result<Reservation> result)
     {
         if (reservation.startDate > reservation.endDate)
@@ -344,7 +334,6 @@ public class ReservationService
     //         result.AddMessage("Reservation already exists");
     //     }
     // }
-
     private Result<Reservation> ValidateNulls(Reservation reservation)
     {
         var result = new Result<Reservation>();

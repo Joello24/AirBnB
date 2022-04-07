@@ -78,15 +78,23 @@ public class Controller
                 throw new Exception("Invalid option");
         }
     }
-    
     private void CancelReservation()
     {
         var newReservation = new Reservation();
-        View.DisplayHeader("Edit Reservation");
+        View.DisplayHeader("Cancel Reservation");
         var guest = GrabGuest();
         var host = GrabHost();
         
-        var reservation = _reservationService.GetReservation(guest.Id,host.Id);
+        var reservations = _reservationService.GetReservations(host.Id);
+        if (!reservations.Success)
+        {
+            View.HandleListResult(reservations);
+            return;
+        }
+        var Options = reservations.Value.Where(reservation => guest.Id == reservation.guest.Id).ToList();
+        var reservationToEdit = View.GetReservationNumber(Options);
+        var reservation = _reservationService.GetReservation(reservationToEdit.id,guest.Id,host.Id);
+        
         Result<Reservation> result = new Result<Reservation>();
         if (reservation == null)
         {
@@ -96,7 +104,6 @@ public class Controller
         result = _reservationService.DeleteReservation(reservation.Value);
         View.HandleSingleResult(result);
     }
-
     private Host GrabHost()
     {
         bool grabbing = true;
@@ -133,34 +140,22 @@ public class Controller
         View.LineBreak();
         return guest.Value;
     }
-
     private void EditReservation()
     {
         var newReservation = new Reservation();
         View.DisplayHeader("Edit Reservation");
-        var guest = SelectGuest();
-        if (!guest.Success)
-        {
-            View.DisplayResultMessages(guest.Messages);
-            return;
-        }
-        
-        View.DisplayGreen(guest.ToString());
+        var guest = GrabGuest();
+        var host = GrabHost();
 
-        View.LineBreak();
-        
-        var host = SelectHost();
-        if (host == null)
+        var reservations = _reservationService.GetReservations(host.Id);
+        if (!reservations.Success)
         {
+            View.HandleListResult(reservations);
             return;
         }
-        host.Value.ToString();
-        guest.Value.ToString();
-        
-        var reservations = _reservationService.GetReservations(host.Value.Id);
-        var Options = reservations.Value.Where(reservation => guest.Value.Id == reservation.guest.Id).ToList();
+        var Options = reservations.Value.Where(reservation => guest.Id == reservation.guest.Id).ToList();
         var reservationToEdit = View.GetReservationNumber(Options);
-        var reservation = _reservationService.GetReservation(reservationToEdit.id,guest.Value.Id,host.Value.Id);
+        var reservation = _reservationService.GetReservation(reservationToEdit.id,guest.Id,host.Id);
         
         if (reservation != null)
         {
@@ -179,55 +174,37 @@ public class Controller
             }
         }
     }
-
     private void AddUpdatedReservation(Reservation newReservation, Reservation oldReservation)
     {
         Result<Reservation> result = new Result<Reservation>();
         result = _reservationService.UpdateReservation(newReservation, oldReservation);
         View.HandleSingleResult(result, "Update Successful!");
     }
-
     private void MakeReservation()
     {
         View.DisplayHeader("Make Reservation");
-        var guest = SelectGuest();
-        if (!guest.Success)
-        {
-            View.DisplayResultMessages(guest.Messages);
-            return;
-        }
-        View.DisplayGreen("\nGuest found!");
-        View.DisplayGreen(guest.Value.ToString());
+        var guest = GrabGuest();
+        var host = GrabHost();
         
-        View.LineBreak();
-        
-        var host = SelectHost();
-        if (!host.Success)
-        {
-            return;
-        }
-        View.DisplayGreen("\nHost found!");
-        View.DisplayGreen(host.Value.ToString());
         Reservation reservation = new Reservation();
-        reservation.guest = guest.Value;
-        reservation.host = host.Value;
+        reservation.guest = guest;
+        reservation.host = host;
         
-        ViewReservations(host.Value);
+        ViewReservations(host);
         reservation.startDate = View.GetDate("Enter Start Date:");
         reservation.endDate = View.GetDate("Enter End Date:");
-        _reservationService.CalculateTotalCost(reservation, host.Value);
-        bool okay = View.Confirm("Is this okay [y/n]: ");
-        if (!okay)
+        _reservationService.CalculateTotalCost(reservation, host);
+        
+        if (!View.Confirm("Is this okay [y/n]: "))
         {
             View.DisplayRed("Reservation Cancelled!");
             return;
         }
+        
         Result<Reservation> result = _reservationService.CreateReservation(reservation);
-
         // TODO: Modify all other reservation outputs to use new Print() method. Commented method is deprecated.
         View.HandleSingleResult(result, "Reservation Created!");
     }
-
     private Result<Host> SelectHost()
     {
         int choice = View.GetSearchMethod("Host");
@@ -247,7 +224,6 @@ public class Controller
                 throw new Exception("Invalid option");
         }
     }
-
     private Result<Host> SearchHostByName()
     {
         string NamePrefix = "";
@@ -283,7 +259,6 @@ public class Controller
         guest.Value = guests[index - 1];
         return guest;
     }
-
     private Result<Host> SearchHostByEmail()
     {
         string email = "";
@@ -300,7 +275,6 @@ public class Controller
         guest = _guestService.FindByEmail(email);
         return guest;
     }
-
     private void ViewReservations()
     {
         Result<List<Reservation>> result = new Result<List<Reservation>>();
@@ -315,14 +289,12 @@ public class Controller
         result = _reservationService.GetReservations(host.Value.Id);
         View.HandleListResult(result);
     }
-
     private void ViewReservations(Host host)
     {
         Result<List<Reservation>> result = new Result<List<Reservation>>();
         result = _reservationService.GetReservations(host.Id);
         View.HandleListResult(result);
     }
-
     private Result<Reservation> BuildReservation(Result<Reservation> reservation)
     {
         Result<Reservation> result = new Result<Reservation>();
