@@ -156,15 +156,20 @@ public class Controller
         }
         host.Value.ToString();
         guest.Value.ToString();
-        var reservation = _reservationService.GetReservation(guest.Value.Id,host.Value.Id);
-        if (reservation.Success)
+        
+        var reservations = _reservationService.GetReservations(host.Value.Id);
+        var Options = reservations.Value.Where(reservation => guest.Value.Id == reservation.guest.Id).ToList();
+        var reservationToEdit = View.GetReservationNumber(Options);
+        var reservation = _reservationService.GetReservation(reservationToEdit.id,guest.Value.Id,host.Value.Id);
+        
+        if (reservation != null)
         {
             newReservation.startDate = View.EditReservationDate(reservation.Value.startDate, "Start");
             newReservation.endDate = View.EditReservationDate(reservation.Value.endDate, "End");
             newReservation.id = reservation.Value.id;
             newReservation.guest = reservation.Value.guest;
             newReservation.host = reservation.Value.host;
-            AddUpdatedReservation(newReservation);
+            AddUpdatedReservation(newReservation, reservation.Value);
         }
         else
         {
@@ -175,10 +180,10 @@ public class Controller
         }
     }
 
-    private void AddUpdatedReservation(Reservation newReservation)
+    private void AddUpdatedReservation(Reservation newReservation, Reservation oldReservation)
     {
         Result<Reservation> result = new Result<Reservation>();
-        result = _reservationService.UpdateReservation(newReservation);
+        result = _reservationService.UpdateReservation(newReservation, oldReservation);
         View.HandleSingleResult(result, "Update Successful!");
     }
 
@@ -191,7 +196,7 @@ public class Controller
             View.DisplayResultMessages(guest.Messages);
             return;
         }
-        View.Display("Guest found!");
+        View.DisplayGreen("\nGuest found!");
         View.DisplayGreen(guest.Value.ToString());
         
         View.LineBreak();
@@ -201,6 +206,7 @@ public class Controller
         {
             return;
         }
+        View.DisplayGreen("\nHost found!");
         View.DisplayGreen(host.Value.ToString());
         Reservation reservation = new Reservation();
         reservation.guest = guest.Value;
@@ -208,11 +214,18 @@ public class Controller
         
         ViewReservations(host.Value);
         reservation.startDate = View.GetDate("Enter Start Date:");
-        reservation.endDate = View.GetDate("Enter End Date:"); 
-        
+        reservation.endDate = View.GetDate("Enter End Date:");
+        _reservationService.CalculateTotalCost(reservation, host.Value);
+        bool okay = View.Confirm("Is this okay [y/n]: ");
+        if (!okay)
+        {
+            View.DisplayRed("Reservation Cancelled!");
+            return;
+        }
         Result<Reservation> result = _reservationService.CreateReservation(reservation);
-        //View.HandleSingleResult(result, "Reservation Created!");
-        result.Value.Print();
+
+        // TODO: Modify all other reservation outputs to use new Print() method. Commented method is deprecated.
+        View.HandleSingleResult(result, "Reservation Created!");
     }
 
     private Result<Host> SelectHost()
@@ -308,5 +321,17 @@ public class Controller
         Result<List<Reservation>> result = new Result<List<Reservation>>();
         result = _reservationService.GetReservations(host.Id);
         View.HandleListResult(result);
+    }
+
+    private Result<Reservation> BuildReservation(Result<Reservation> reservation)
+    {
+        Result<Reservation> result = new Result<Reservation>();
+        result.Value = _reservationService.BuildReservationData(reservation.Value);
+        if (result.Value == null)
+        {
+            result = reservation;
+            return result;
+        }
+        return result;
     }
 }   

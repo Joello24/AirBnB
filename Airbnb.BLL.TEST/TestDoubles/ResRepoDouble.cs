@@ -38,13 +38,18 @@ public class ResRepoDouble : IReservationRepo
 
     public Result<Reservation> GetReservation(int id, string hostId)
     {
-        var result = _reservations.Find(r => r.id == id && r.host.Id == hostId);
+        var result = _reservations.Find(r => r.guest.Id == id && r.host.Id == hostId);
         
         return new Result<Reservation>()
         {
             Value = result
         };
         
+    }
+
+    public Result<Reservation> GetReservation(int resId, int guestId, string hostId)
+    {
+        throw new NotImplementedException();
     }
 
     public Result<List<Reservation>> GetReservationsByHost(string hostId)

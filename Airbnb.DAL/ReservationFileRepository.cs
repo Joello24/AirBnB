@@ -46,6 +46,36 @@ public class ReservationFileRepository : IReservationRepo
         }
         return result;
     }
+    public Result<Reservation> GetReservation(int reservationId, int guestId, string hostId)
+    {
+        Result<Reservation> result = new Result<Reservation>();
+        List<Reservation> reservations = new List<Reservation>();
+        var grabber = new Result<List<Reservation>>();
+        try
+        {
+            grabber = GetReservationsByHost(hostId);
+        }
+        catch (Exception e)
+        {
+            _logger.Log(e.ToString());
+            throw;
+        }
+
+        if(grabber.Success)
+            reservations = grabber.Value;
+        else
+        {
+            result.AddMessage("Host doesn't have any reservations");
+            return result;
+        }
+
+        result.Value = reservations.Find(r => r.guest.Id == guestId && r.id == reservationId);
+        if (result.Value == null)
+        {
+            result.AddMessage("Reservation not found");
+        }
+        return result;
+    }
 
     public Result<List<Reservation>> GetReservationsByHost(string hostId)
     {

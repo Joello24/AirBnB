@@ -25,17 +25,7 @@ public class ReservationService
         }
 
         var hold = _reservationRepository.CreateReservation(reservation);
-        if (hold.Success)
-        {
-            result.Value = BuildReservationData(hold.Value);
-        }
-        else
-        {
-            foreach (var m in hold.Messages)
-            {
-                result.AddMessage(m);
-            }
-        }
+        result = hold;
         return result;
     }
     
@@ -74,6 +64,7 @@ public class ReservationService
         {
             return result;
         }
+        // TODO: Consider moving BuildReservationData() call to controller
         var hold = _reservationRepository.DeleteReservation(res);
         if (hold.Success)
         {
@@ -86,13 +77,14 @@ public class ReservationService
         return result;
     }
 
-    public Result<Reservation> UpdateReservation(Reservation reservation)
+    public Result<Reservation> UpdateReservation(Reservation reservation, Reservation oldReservation)
     {
-        Result<Reservation> result = Validate(reservation);
+        Result<Reservation> result = ValidateEdit(reservation, oldReservation);
         if (!result.Success)
         {
             return result;
         }
+        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
         var hold = _reservationRepository.UpdateReservation(reservation);
         if (hold.Success)
         {
@@ -114,12 +106,26 @@ public class ReservationService
             result = res;
             return result;
         }
+        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
+        result.Value = BuildReservationData(res.Value);
+        return result;
+    }
+    public Result<Reservation> GetReservation(int resId, int guestId, string hostId)
+    {
+        Result<Reservation> result = new Result<Reservation>();
+        var res = _reservationRepository.GetReservation(resId,guestId, hostId);
+        if (!res.Success)
+        {
+            result = res;
+            return result;
+        }
+        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
         result.Value = BuildReservationData(res.Value);
         return result;
     }
 
     public Result<List<Reservation>> GetReservations(string hostId)
-    {
+    { 
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
         Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
         
@@ -138,7 +144,7 @@ public class ReservationService
         return res;
     }
 
-    private List<Reservation> BuildReservationData(List<Reservation> res)
+    public List<Reservation> BuildReservationData(List<Reservation> res)
     {
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
         Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
@@ -153,7 +159,7 @@ public class ReservationService
         }
         return reservations;
     }
-    private Reservation BuildReservationData(Reservation res)
+    public Reservation BuildReservationData(Reservation res)
     {
         Result<Reservation> result = new Result<Reservation>();
         if (!result.Success)
@@ -169,7 +175,7 @@ public class ReservationService
             return null;
         } 
         
-        Reservation buildRes = _reservationRepository.GetReservation(res.guest.Id, res.host.Id).Value;
+        Reservation buildRes = _reservationRepository.GetReservation(res.id,res.guest.Id,res.host.Id).Value;
         buildRes.guest = guests[buildRes.guest.Id];
         buildRes.host = hosts[buildRes.host.Id];
         buildRes.totalPrice = CalculateTotalCost(buildRes.host.weekdayRate,buildRes.host.weekendRate, buildRes.startDate, buildRes.endDate);
@@ -196,6 +202,30 @@ public class ReservationService
         }
         return totalCost;
     }
+    public void CalculateTotalCost(Reservation reservation, Host host)
+    {
+        DateOnly startDate = reservation.startDate;
+        DateOnly endDate = reservation.endDate;
+        decimal weekdayRate = host.weekdayRate;
+        decimal weekendRate = host.weekendRate;
+        decimal totalCost = 0;
+        DateTime start = DateTime.Parse(startDate.ToString());
+        DateTime end = DateTime.Parse(endDate.ToString());
+        int days = (end - start).Days;
+        for (int i = 0; i < days; i++)
+        {
+            if (startDate.DayOfWeek == DayOfWeek.Saturday || startDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                totalCost += weekendRate;
+            }
+            else
+            {
+                totalCost += weekdayRate;
+            }
+            startDate = startDate.AddDays(1);
+        }
+        reservation.totalPrice = totalCost;
+    }
 
     private Result<Reservation> Validate(Reservation reservation)
     {
@@ -204,7 +234,7 @@ public class ReservationService
         {
             return result;
         }
-        ValidateDuplicates(reservation, result);
+        //ValidateDuplicates(reservation, result);
         if (!result.Success)
         {
             return result;
@@ -222,6 +252,26 @@ public class ReservationService
 
         return result;
 
+    }
+    private Result<Reservation> ValidateEdit(Reservation reservation, Reservation oldReservation)
+    {
+        Result<Reservation> result = ValidateNulls(reservation);
+        if (!result.Success)
+        {
+            return result;
+        }
+        ValidateEditFields(reservation, result, oldReservation);
+        if (!result.Success)
+        {
+            return result;
+        }
+        ValidateChildrenExist(reservation, result);
+        if (!result.Success)    
+        {
+            return result;      
+        }
+
+        return result;
     }
 
     private void ValidateChildrenExist(Reservation reservation, Result<Reservation> result)
@@ -261,13 +311,39 @@ public class ReservationService
             result.AddMessage("Host is already booked for that time");
         }
     }
-    private void ValidateDuplicates(Reservation reservation, Result<Reservation> result)
+    private void ValidateEditFields(Reservation reservation, Result<Reservation> result, Reservation oldReservation)
     {
-        if (_reservationRepository.GetReservation(reservation.guest.Id, reservation.host.Id).Value != null)
+        if (reservation.startDate > reservation.endDate)
         {
-            result.AddMessage("Reservation already exists");
+            result.AddMessage("Start date must be before end date");
+        }
+
+        if (reservation.host.Reservations == null)
+        {
+            return;
+        }
+        // Check for overlap with other reservations excluding oldReservation dates
+        // TODO: TEST THIS STUFF MORE
+        if(reservation.host.Reservations.Any(r => r.startDate <= reservation.startDate && r.endDate >= reservation.startDate && r.id != reservation.id))
+        {
+            result.AddMessage("Host is already booked for that time");
+        }
+        else if (reservation.host.Reservations.Any(r => r.startDate <= reservation.endDate && r.endDate >= reservation.endDate && r.id != reservation.id))
+        {
+            result.AddMessage("Host is already booked for that time");
+        }
+        else if (reservation.host.Reservations.Any(r => r.startDate >= reservation.startDate && r.endDate <= reservation.endDate && r.id != reservation.id))
+        {
+            result.AddMessage("Host is already booked for that time");
         }
     }
+    // private void ValidateDuplicates(Reservation reservation, Result<Reservation> result)
+    // {
+    //     if (_reservationRepository.GetReservation(reservation.guest.Id, reservation.host.Id).Value != null)
+    //     {
+    //         result.AddMessage("Reservation already exists");
+    //     }
+    // }
 
     private Result<Reservation> ValidateNulls(Reservation reservation)
     {

@@ -17,7 +17,7 @@ public static class View
 
   internal static bool Confirm(string message = "Are you sure?")
   {
-    Console.Write(message + " (y/n)");
+    Console.Write(message);
     var input = Console.ReadLine() ?? string.Empty;
 
     return input.ToLower().StartsWith("y");
@@ -164,7 +164,7 @@ Enter Choice: ", 0, 6);
 
   public static DateOnly EditReservationDate(DateOnly date, string description)
   {
-    return Validation.PromptUser4Date($"{description} {date}: ");
+    return Validation.PromptUser4Date($"{description} ({date}): ", date);
   }
 
   public static void DisplayGreen(string message)
@@ -224,8 +224,7 @@ Enter Choice: ", 0, 6);
     if (result.Success)
     {
       DisplayGreen(successMessage);
-      View.Display($"{result.Value}");
-      View.LineBreak();
+      result.Value.Print();
     }
     else
     {
@@ -236,13 +235,21 @@ Enter Choice: ", 0, 6);
   {
     if (result.Success)
     {
-      View.Display($"{result.Value}");
-      View.LineBreak();
+      result.Value.Print();
     }
     else
     {
       View.DisplayResultMessages(result.Messages);
     }
   }
-  
+
+  public static Reservation GetReservationNumber(List<Reservation> options)
+  { 
+    foreach (var r in options)
+    {
+      r.Print();
+    }
+    int choice = Validation.PromptForResID("Enter reservation number: ",options);
+    return options.Find(r=>r.id == choice);
+  }
 }

@@ -9,7 +9,7 @@ public class Reservation
     public Host host { get; set; }
     public Property property { get; set; }
     public decimal totalPrice { get; set; }
-    
+
     public override string ToString()
     {
         return 

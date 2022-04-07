@@ -1,3 +1,5 @@
+using Airbnb.CORE.Models;
+
 namespace Airbnb.UI;
 
 public static class Validation
@@ -65,8 +67,19 @@ Press Enter to Continue");
     }
     return result;
   }
-
-  // default here means it takes the absolute minimum value for a DateOnly
+  
+  internal static DateOnly PromptUser4Date(string message, DateOnly date)
+  {
+    DateOnly result;
+    while (!(DateOnly.TryParse(PromptUser(message), out result)) && result != DateOnly.MinValue)
+    {
+      View.DisplayRed($"Invalid Input.");
+      Prompt2Continue();
+    }
+    if (result == DateOnly.MinValue)
+      result = date;
+    return result;
+  }
   internal static DateOnly PromptUser4Date(string message)
   {
     DateOnly result;
@@ -75,6 +88,18 @@ Press Enter to Continue");
       PromptUser($"Invalid Input.");
       Prompt2Continue();
     }
+    return result;
+  }
+
+  public static int PromptForResID(string message, List<Reservation> options)
+  {
+    int result;
+    while (!int.TryParse(PromptUser(message), out result) || !options.Any(i=>i.id == result))
+    {
+      View.DisplayRed("Invalid Input.");
+      Prompt2Continue();
+    }
+    
     return result;
   }
 }
