@@ -148,7 +148,17 @@ Enter Choice: ", 0, 6);
     foreach(Host host in hosts.Take(25))
     {
       filePopIndicator = host.Reservations == null ? "Empty" : host.Reservations.Count.ToString() + " Reservations";
-      Display($"{index++}: {host.LastName}- {filePopIndicator}");
+      if (filePopIndicator == "Empty")
+      {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Display($"{index++}: {host.LastName}- {filePopIndicator}");
+      }
+      else
+      {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Display($"{index++}: {host.LastName}- {filePopIndicator}");
+      }
+       Console.ResetColor();
     }
 
     if(hosts.Count > 25)
@@ -223,6 +233,7 @@ Enter Choice: ", 0, 6);
   {
     if (result.Success)
     {
+      Console.WriteLine();
       DisplayGreen(successMessage);
       result.Value.Print();
     }

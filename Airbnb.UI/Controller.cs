@@ -92,6 +92,11 @@ public class Controller
             return;
         }
         var Options = reservations.Value.Where(reservation => guest.Id == reservation.guest.Id).ToList();
+        if (Options.Count == 0)
+        {
+            View.DisplayRed("No reservations found.");
+            return;
+        }
         var reservationToEdit = View.GetReservationNumber(Options);
         var reservation = _reservationService.GetReservation(reservationToEdit.id,guest.Id,host.Id);
         
@@ -102,7 +107,7 @@ public class Controller
             return;
         }
         result = _reservationService.DeleteReservation(reservation.Value);
-        View.HandleSingleResult(result);
+        View.HandleSingleResult(result, "Reservation Cancelled!");
     }
     private Host GrabHost()
     {
