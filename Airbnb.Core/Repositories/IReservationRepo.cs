@@ -12,4 +12,5 @@ public interface IReservationRepo
     Result<Reservation> UpdateReservation(Reservation reservation);
     Result<Reservation> DeleteReservation(Reservation reservation);
 
+    List<Reservation> GetAllReservations(List<Host> hosts);
 }

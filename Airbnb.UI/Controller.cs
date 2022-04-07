@@ -11,7 +11,7 @@ public class Controller
     private readonly GuestService _guestService;
     private readonly HostService _hostService;
     private readonly ReservationService _reservationService;
-    
+    public static int Timeout = 50;
     public Controller(GuestService guestService, HostService hostService, ReservationService reservationService)
     {
         _guestService = guestService;
@@ -21,7 +21,6 @@ public class Controller
 
     public void Run()
     {
-        View.DisplayHeader("Welcome to Air-BnB!");
         RunAppLoop();
         
         // catch(RepositoryException ex)
@@ -36,6 +35,8 @@ public class Controller
         MainMenuOption option;
         do
         {
+            Thread.Sleep(Timeout);
+            Console.Clear();
             option = (MainMenuOption)View.GetMainChoice();
             switch(option)
             {
@@ -51,12 +52,25 @@ public class Controller
                 case MainMenuOption.CancelReservation:
                     CancelReservation();
                     break;
+                case MainMenuOption.Exit:
+                    ExitApp();
+                    break;
+                case MainMenuOption.Settings:
+                    Settings();
+                    break;
                 default:
-                    throw new Exception("Invalid option");
+                    View.DisplayRed("Invalid option.");
+                    Thread.Sleep(200);
+                    Console.Clear();
+                    break;
             }
         } while(option != MainMenuOption.Exit);
     }
 
+    private void ExitApp()
+    {
+        View.DisplayHeader("Goodbye.");
+    }
     private Result<Guest> SelectGuest()
     {
         int choice = View.GetSearchMethod("Guest");
@@ -66,17 +80,21 @@ public class Controller
         List<Guest> guests = new List<Guest>();
         switch (choice)
         {
+            case 0:
+                RunAppLoop();
+                break;
             case 1:
                 guest = SearchGuestByEmail();
                 return guest;
                 break;
-                    
             case 2:
                 guest = SearchGuestByName();
                 return guest;
             default:
                 throw new Exception("Invalid option");
         }
+
+        return guest;
     }
     private void CancelReservation()
     {
@@ -217,6 +235,9 @@ public class Controller
         List<Host> hosts = new List<Host>();
         switch (choice)
         {
+            case 0:
+                RunAppLoop();
+                break;
             case 1:
                 host = SearchHostByEmail();
                 return host;
@@ -228,6 +249,8 @@ public class Controller
             default:
                 throw new Exception("Invalid option");
         }
+
+        return host;
     }
     private Result<Host> SearchHostByName()
     {
@@ -268,7 +291,7 @@ public class Controller
     {
         string email = "";
         Result<Host> host = new Result<Host>();
-        email = Validation.ReadRequiredString("Enter Email:");
+        email = Validation.ReadRequiredString("Enter Email: ");
         host = _hostService.FindByEmail(email);
         return host;
     }
@@ -276,7 +299,7 @@ public class Controller
     {
         string email = "";
         Result<Guest> guest = new Result<Guest>();
-        email = Validation.ReadRequiredString("Enter Email:");
+        email = Validation.ReadRequiredString("Enter Email: ").Trim();
         guest = _guestService.FindByEmail(email);
         return guest;
     }
@@ -300,15 +323,44 @@ public class Controller
         result = _reservationService.GetReservations(host.Id);
         View.HandleListResult(result);
     }
-    private Result<Reservation> BuildReservation(Result<Reservation> reservation)
+    private void Settings()
     {
-        Result<Reservation> result = new Result<Reservation>();
-        result.Value = _reservationService.BuildReservationData(reservation.Value);
-        if (result.Value == null)
+        Console.Clear();
+        SettingsMenu option;
+        do
         {
-            result = reservation;
-            return result;
+            option = (SettingsMenu)View.GetSettingsChoice();
+            switch(option)
+            {
+                case SettingsMenu.ColorScheme:
+                    SetColorScheme();
+                    break;
+                case SettingsMenu.MenuResetDelay:
+                    SetMenuDelay();
+                    break;
+                case SettingsMenu.Exit:
+                    RunAppLoop();
+                    break;
+                default:
+                    View.DisplayRed("Invalid option.");
+                    Thread.Sleep(200);
+                    Console.Clear();
+                    break;
+            }
+        } while(option != SettingsMenu.Exit);
+    }
+    private void SetMenuDelay()
+    {
+        Timeout = (int)Validation.PromptUser4Num("Enter new menu delay (0-3000)ms:", 0, 3000);
+    }
+
+    private void SetColorScheme()
+    {
+        ColorScheme scheme = (ColorScheme)View.GetColorScheme();
+        List<Reservation> reservations = _reservationService.GetAllReservations();
+        foreach (var reservation in reservations)
+        {
+            reservation.colorScheme = scheme;
         }
-        return result;
     }
 }   

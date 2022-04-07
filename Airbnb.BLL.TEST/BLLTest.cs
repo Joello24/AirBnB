@@ -61,21 +61,48 @@ public class ReservationServiceTests
     }
 
     [Test]
-     public void FindByHostandGuestID()
+     public void GetReservation()
      {
-         var result = reservationService.GetReservation(50, "2e72f86c-b8fe-4265-b4f1-304dea8762db");
+         var result = reservationService.GetReservation(0,50, "2e72f86c-b8fe-4265-b4f1-304dea8762db");
          Assert.IsNotNull(result);
-         //Assert.AreEqual(3, result.Value.id);
+         Assert.AreEqual(200m, result.Value.host.weekdayRate);
      }
      
      [Test]
      public void CreateReservation()
      {
-         var reservation = reservationService.GetReservation(GuestRepoDouble.Guest1.Id, HostRepoDouble.Host1.Id).Value;
+         var reservation = reservationService.GetReservation(0,50, "2e72f86c-b8fe-4265-b4f1-304dea8762db");
          
-         reservation.guest.Id = GuestRepoDouble.Guest2.Id;
-         var result = reservationService.CreateReservation(reservation);
+         reservation.Value.guest = GuestRepoDouble.Guest2;
+         reservation.Value.host = HostRepoDouble.Host2;
+         var result = reservationService.CreateReservation(reservation.Value);
          Assert.IsNotNull(result);
-         Assert.AreEqual(reservation.endDate, result.Value.endDate);
+         Assert.AreEqual(reservation.Value.endDate, result.Value.endDate);
+         Assert.IsTrue(result.Success);
+     }
+
+     [Test]
+     public void UpdateReservation()
+     {
+         var reservation = reservationService.GetReservation(0,50, "2e72f86c-b8fe-4265-b4f1-304dea8762db");
+         var oldRes = reservation.Value;
+         reservation.Value.endDate = new DateOnly(2020,1,1);
+         var actual = reservationService.UpdateReservation(reservation.Value, oldRes);
+         Assert.IsNotNull(actual);
+         Assert.AreEqual(new DateOnly(2020,1,1), actual.Value.endDate);
+         Assert.IsTrue(actual.Success);
+     }
+     
+     [Test]
+     public void DeleteReservation()
+     {
+         var reservation = reservationService.GetReservation(0,50, "2e72f86c-b8fe-4265-b4f1-304dea8762db");
+         reservation.Value.id = 99;
+         
+         
+         var actual = reservationService.DeleteReservation(reservation.Value);
+         Assert.IsNotNull(actual);
+         Assert.AreEqual(reservationService.GetReservation(99,50, "2e72f86c-b8fe-4265-b4f1-304dea8762db").Value, null);
+         Assert.IsTrue(actual.Success);
      }
 }

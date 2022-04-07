@@ -12,7 +12,7 @@ public class ResRepoDouble : IReservationRepo
     public ResRepoDouble()
     {
         Reservation res1 = new Reservation();
-        res1.id = 50;
+        res1.id = 0;
         res1.startDate = new DateOnly(2019, 1, 1);
         res1.endDate = new DateOnly(2019, 1, 2);
         res1.guest = GuestRepoDouble.Guest1;
@@ -44,12 +44,17 @@ public class ResRepoDouble : IReservationRepo
         {
             Value = result
         };
-        
     }
 
     public Result<Reservation> GetReservation(int resId, int guestId, string hostId)
     {
-        throw new NotImplementedException();
+        Result<Reservation> result = new Result<Reservation>();
+        var reservation = _reservations.Find(r => r.guest.Id == guestId && r.host.Id == hostId && r.id == resId);
+        if(result == null)
+            result.AddMessage("Reservation not found");
+        
+        result.Value = reservation;
+        return result;
     }
 
     public Result<List<Reservation>> GetReservationsByHost(string hostId)
@@ -72,10 +77,24 @@ public class ResRepoDouble : IReservationRepo
     }
     public Result<Reservation> UpdateReservation(Reservation reservation)
     {
-        throw new System.NotImplementedException();
+        var resToUpdate = GetReservation(reservation.id, reservation.guest.Id, reservation.host.Id).Value;
+        resToUpdate.startDate = reservation.startDate;
+        resToUpdate.endDate = reservation.endDate;
+        Result<Reservation> result = new Result<Reservation>();
+        result.Value = resToUpdate;
+        return result;
     }
     public Result<Reservation> DeleteReservation(Reservation reservation)
     {
-        throw new System.NotImplementedException();
+        var resToDelete = GetReservation(reservation.id, reservation.guest.Id, reservation.host.Id).Value;
+        _reservations.Remove(resToDelete);
+        Result<Reservation> result = new Result<Reservation>();
+        result.Value = reservation;
+        return result;
+    }
+
+    public List<Reservation> GetAllReservations(List<Host> hosts)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -113,6 +113,28 @@ public class ReservationFileRepository : IReservationRepo
         return result;
     }
 
+    public List<Reservation> GetAllReservations(List<Host> hosts)
+    {
+        var reservations = new List<Reservation>();
+        foreach (var host in hosts)
+        {
+            var grabber = new Result<List<Reservation>>();
+            try
+            {
+                grabber = GetReservationsByHost(host.Id);
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e.ToString());
+                throw;
+            }
+
+            if(grabber.Success)
+                reservations.AddRange(grabber.Value);
+        }
+        return reservations;
+    }
+
     private Reservation DeserializeReservation(string[] columns, string hostID)
     {
         Reservation ret = new Reservation();
@@ -136,7 +158,6 @@ public class ReservationFileRepository : IReservationRepo
         Result<Reservation> result = new Result<Reservation>();
         var path = Path.Combine(_dirPath, reservation.host.Id + ".csv");
         Result<List<Reservation>> current = GetReservationsByHost(reservation.host.Id);
-        
         
         if (!current.Success && !File.Exists(path))
         {

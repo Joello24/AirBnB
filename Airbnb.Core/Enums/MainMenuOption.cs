@@ -9,6 +9,8 @@ EditReservation,
 CancelReservation,
 ViewGuests,
 ViewHosts,
+Settings = 99
+
 
 }
 
@@ -21,6 +23,7 @@ public static class MenuOptionExtensions
         MainMenuOption.MakeReservation => "Make Reservation",
         MainMenuOption.EditReservation => "Edit Reservation",
         MainMenuOption.CancelReservation => "Cancel Reservation",
+        MainMenuOption.Settings => "Settings",
         MainMenuOption.ViewGuests => "View Guests",
         MainMenuOption.ViewHosts => "View Hosts",
         _ => throw new NotImplementedException()

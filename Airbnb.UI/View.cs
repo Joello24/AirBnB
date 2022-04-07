@@ -6,13 +6,27 @@ namespace Airbnb.UI;
 public static class View
 {
 
+  public static bool boringColorsOn = false;
+  public static bool customColorOn = false;
+  public static ConsoleColor customColor = ConsoleColor.White;
   public static int GetLoggingMode()
   {
+    DisplayGreen("\n\nINITIAL CONIFIGURATION");
     return (int)Validation.PromptUser4Num(@"What logging mode do you want to use?
 1. No logging
 2. Log to console
 3. Log to file
-", 1, 3);
+Select Mode: ", 1, 3);
+  }
+  
+  public static int GetColorScheme()
+  {
+    DisplayGreen("\n\nINITIAL CONIFIGURATION");
+    return (int)Validation.PromptUser4Num(@"What color scheme do you want to use?
+1. Colorful
+2. Light
+3. Dark
+Select Mode: ", 1, 3);
   }
 
   internal static bool Confirm(string message = "Are you sure?")
@@ -30,8 +44,24 @@ public static class View
 
   public static void DisplayHeader(string header)
   {
+    Random rnd = new Random();
+    var consoleColors = Enum.GetValues(typeof(ConsoleColor));
+  
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.BackgroundColor = (ConsoleColor)consoleColors.GetValue(rnd.Next(consoleColors.Length));
+    Console.WriteLine();
+    foreach (var _ in Enumerable.Range(0, header.Length))
+    {
+      DisplayInLine("-");
+    }
+    Console.WriteLine();
     Display(header);
-    Display("------------------------------------------");
+    foreach (var _ in Enumerable.Range(0, header.Length))
+    {
+      DisplayInLine("-");
+    }
+    Console.WriteLine();
+    Console.ResetColor();
   }
 
   public static int GetApplicationMode()
@@ -53,6 +83,18 @@ Select mode: ", 1, 2);
 2. Make a Reservation
 3. Edit a Reservation
 4. Cancel a Reservation
+99. Settings
+Enter Choice: ", 0, 6, 99);
+  }
+  
+  internal static int GetSettingsChoice()
+  {
+    DisplayHeader("Settings Menu");
+
+    return (int)Validation.PromptUser4Num($@"
+0. Exit
+1. Color Scheme
+2. Delay Timer
 Enter Choice: ", 0, 6);
   }
 
@@ -95,10 +137,16 @@ Enter Choice: ", 0, 6);
   }
   public static int GetSearchMethod(string type)
   {
-    Display($"Selecting {type}, Choose a Search Method");
+    Console.ForegroundColor = ConsoleColor.Blue;
+    Display($"\nSelecting {type}, Choose a Search Method");
+    Console.ResetColor();
+    Console.ForegroundColor = ConsoleColor.Red;
+    Display("0. Exit");
+    Console.ForegroundColor = ConsoleColor.Green;
     Display("1. Email");
     Display("2. Name");
-    return (int)Validation.PromptUser4Num("Enter your choice [1-2]: ", 1, 2);
+    Console.ResetColor();
+    return (int)Validation.PromptUser4Num("Enter your choice [0-2]: ", 0, 2);
   }
   public static string GetNamePrefix()
   {

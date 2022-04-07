@@ -62,8 +62,24 @@ public static class Validation
     decimal result;
     while (!decimal.TryParse(PromptUser(message), out result) || result < min || result > max)
     {
-      PromptUser($@"Invalid Input, must be between {min} and {max}
-Press Enter to Continue");
+      View.DisplayRed("Invalid Input");
+      Thread.Sleep(200);
+      Console.Clear();
+    }
+    return result;
+  }
+  internal static decimal PromptUser4Num(string message, decimal min, decimal max, decimal randomInclude)
+  {
+    decimal result;
+    while (!decimal.TryParse(PromptUser(message), out result) || result < min || result > max)
+    {
+      if (result == randomInclude)
+      {
+        return result;
+      }
+      View.DisplayRed("Invalid Input");
+      Thread.Sleep(200);
+      Console.Clear();
     }
     return result;
   }

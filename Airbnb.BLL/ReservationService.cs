@@ -175,6 +175,14 @@ public class ReservationService
         buildRes.totalPrice = CalculateTotalCost(buildRes.host.weekdayRate,buildRes.host.weekendRate, buildRes.startDate, buildRes.endDate);
         return buildRes;
     }
+
+    public List<Reservation> GetAllReservations()
+    {
+        List<Host> hosts = _hostRepository.FindAll().Value;
+        _reservationRepository.GetAllReservations(hosts);
+        return _reservationRepository.GetAllReservations(hosts);
+    }
+
     private decimal CalculateTotalCost(decimal weekdayRate, decimal weekendRate, DateOnly startDate, DateOnly endDate)
     {
         decimal totalCost = 0;

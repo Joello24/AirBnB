@@ -15,7 +15,7 @@ public static class Startup
     const string logFile = dataDir + "log.error.csv";
     const string reservationsDir = dataDir + "reservations/";
   
-    View.DisplayHeader("Welcome to Weather Almanac");
+    View.DisplayHeader("Welcome to Air-BnB!");
     
     LoggingMode logMode = (LoggingMode)View.GetLoggingMode() switch
     {
