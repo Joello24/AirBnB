@@ -353,7 +353,6 @@ public class Controller
     {
         Timeout = (int)Validation.PromptUser4Num("Enter new menu delay (0-3000)ms:", 0, 3000);
     }
-
     private void SetColorScheme()
     {
         ColorScheme scheme = (ColorScheme)View.GetColorScheme();
@@ -364,3 +363,4 @@ public class Controller
         }
     }
 }   
+
