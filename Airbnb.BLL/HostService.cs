@@ -11,21 +11,16 @@ public class HostService
     {
         _hostRepo = hostRepo;
     }
-    
-    // find all
     public Result<List<Host>> FindAll()
     {
         var result = _hostRepo.FindAll();
         return result;
     }
-    // find by email 
     public Result<Host> FindByEmail(string email)
     {
         var result = _hostRepo.FindByEmail(email);
         return result;
     }
-
-
     public List<Host> FindByNameSearch(string namePrefix)
     {
         return _hostRepo.FindAll().Value.Where(x => x.LastName.StartsWith(namePrefix)).ToList();

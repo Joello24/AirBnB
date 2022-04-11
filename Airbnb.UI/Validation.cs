@@ -64,7 +64,7 @@ public static class Validation
     {
       View.DisplayRed("Invalid Input");
       Thread.Sleep(200);
-      Console.Clear();
+      
     }
     return result;
   }

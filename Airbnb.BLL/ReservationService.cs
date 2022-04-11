@@ -17,7 +17,6 @@ public class ReservationService
 
     public Result<Reservation> CreateReservation(Reservation reservation)
     {
-        //reservation.host = PopulateHostReservations(reservation.host);
         Result<Reservation> result = Validate(reservation);
         if (!result.Success)
         {
@@ -62,7 +61,7 @@ public class ReservationService
         {
             return result;
         }
-        // TODO: return populated reservation into hold
+        
         var hold = _reservationRepository.DeleteReservation(res);
         if (hold.Success)
         {
@@ -81,7 +80,7 @@ public class ReservationService
         {
             return result;
         }
-        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
+        
         var hold = _reservationRepository.UpdateReservation(reservation);
         if (hold.Success)
         {
@@ -93,19 +92,7 @@ public class ReservationService
         }
         return result;
     }
-    public Result<Reservation> GetReservation(int id, string hostId)
-    {
-        Result<Reservation> result = new Result<Reservation>();
-        var res = _reservationRepository.GetReservation(id, hostId);
-        if (!res.Success)
-        {
-            result = res;
-            return result;
-        }
-        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
-        result.Value = BuildReservationData(res.Value);
-        return result;
-    }
+    
     public Result<Reservation> GetReservation(int resId, int guestId, string hostId)
     {
         Result<Reservation> result = new Result<Reservation>();
@@ -115,12 +102,13 @@ public class ReservationService
             result = res;
             return result;
         }
-        // TODO: Consider moving BuildReservationData() call to controller, separation of concerns!
+        
         result.Value = BuildReservationData(res.Value);
         return result;
     }
     public Result<List<Reservation>> GetReservations(string hostId)
     { 
+        // TODO: CONSIDER REFACTORING THIS METHOD TO USE FIND BY ID METHODS FROM HOST/GUEST SERVICES TO IMPROVE READABILITY.
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
         Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
         
@@ -138,21 +126,7 @@ public class ReservationService
         }
         return res;
     }
-    public List<Reservation> BuildReservationData(List<Reservation> res)
-    {
-        Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
-        Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
-        
-        List<Reservation> reservations = _reservationRepository.GetReservationsByHost(res[0].host.Id).Value;
-
-        foreach (var reservation in reservations)
-        {
-            reservation.host = hosts[reservation.host.Id];
-            reservation.guest = guests[reservation.guest.Id];
-            reservation.totalPrice = CalculateTotalCost(reservation.host.weekdayRate,reservation.host.weekendRate, reservation.startDate, reservation.endDate);
-        }
-        return reservations;
-    }
+    
     public Reservation BuildReservationData(Reservation res)
     {
         Result<Reservation> result = new Result<Reservation>();
@@ -162,7 +136,7 @@ public class ReservationService
         }
         Dictionary<string, Host> hosts = _hostRepository.FindAll().Value.ToDictionary(h => h.Id);
         Dictionary<int, Guest> guests = _guestRepository.FindAll().Value.ToDictionary(g => g.Id);
-
+        
         Result<Reservation> hold = ValidateNulls(res);
         if (!hold.Success)
         {
@@ -234,11 +208,7 @@ public class ReservationService
         {
             return result;
         }
-        //ValidateDuplicates(reservation, result);
-        if (!result.Success)
-        {
-            return result;
-        }
+        
         ValidateFields(reservation, result);
         if (!result.Success)
         {
@@ -320,8 +290,7 @@ public class ReservationService
         {
             return;
         }
-        // Check for overlap with other reservations excluding oldReservation dates
-        // TODO: TEST THIS STUFF MORE
+        
         if(reservation.host.Reservations.Any(r => r.startDate <= reservation.startDate && r.endDate >= reservation.startDate && r.id != reservation.id))
         {
             result.AddMessage("Host is already booked for that time");
@@ -335,13 +304,6 @@ public class ReservationService
             result.AddMessage("Host is already booked for that time");
         }
     }
-    // private void ValidateDuplicates(Reservation reservation, Result<Reservation> result)
-    // {
-    //     if (_reservationRepository.GetReservation(reservation.guest.Id, reservation.host.Id).Value != null)
-    //     {
-    //         result.AddMessage("Reservation already exists");
-    //     }
-    // }
     private Result<Reservation> ValidateNulls(Reservation reservation)
     {
         var result = new Result<Reservation>();

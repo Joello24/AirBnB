@@ -11,32 +11,30 @@ public class Controller
     private readonly GuestService _guestService;
     private readonly HostService _hostService;
     private readonly ReservationService _reservationService;
-    public static int Timeout = 50;
+    public static int Timeout = 0;
+    public static bool ClearViewOnReset = false;
     public Controller(GuestService guestService, HostService hostService, ReservationService reservationService)
     {
         _guestService = guestService;
         _hostService = hostService;
         _reservationService = reservationService;
     }
+    
 
     public void Run()
     {
         RunAppLoop();
-        
-        // catch(RepositoryException ex)
-        // {
-        //     view.DisplayException(ex);
-        // }
-        // view.DisplayHeader("Goodbye.");
     }
-
     private void RunAppLoop()
     {
         MainMenuOption option;
         do
         {
             Thread.Sleep(Timeout);
-            Console.Clear();
+            if(ClearViewOnReset)
+            {
+                Console.Clear();
+            }
             option = (MainMenuOption)View.GetMainChoice();
             switch(option)
             {
@@ -59,9 +57,9 @@ public class Controller
                     Settings();
                     break;
                 default:
-                    View.DisplayRed("Invalid option.");
-                    Thread.Sleep(200);
                     Console.Clear();
+                    View.DisplayRed("Invalid option.");
+
                     break;
             }
         } while(option != MainMenuOption.Exit);
@@ -361,6 +359,7 @@ public class Controller
         {
             reservation.colorScheme = scheme;
         }
+        // TODO - update reservations colorscheme in file, not in memory
     }
-}   
+}
 

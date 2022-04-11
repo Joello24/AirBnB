@@ -148,7 +148,6 @@ public class ReservationFileRepository : IReservationRepo
         ret.totalPrice = decimal.Parse(columns[4]);
         ret.guest = guest;
         ret.host = host;
-        
         return ret;
     }
     

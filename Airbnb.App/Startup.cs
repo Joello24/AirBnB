@@ -1,6 +1,7 @@
 using Airbnb.Core;
 using Ninject;
 using Airbnb.Core;
+using Airbnb.DAL.Database;
 using Airbnb.UI;
 
 namespace Airbnb.App;
@@ -15,6 +16,8 @@ public static class Startup
     const string logFile = dataDir + "log.error.csv";
     const string reservationsDir = dataDir + "reservations/";
   
+    ReservationDBRepo reservationRepo = new ReservationDBRepo();
+    
     View.DisplayHeader("Welcome to Air-BnB!");
     
     LoggingMode logMode = (LoggingMode)View.GetLoggingMode() switch

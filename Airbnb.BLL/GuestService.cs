@@ -58,6 +58,4 @@ public class GuestService
         ret = _guestRepository.Delete(id);
         return ret;
     }
-    
-    
 }

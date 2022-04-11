@@ -2,6 +2,7 @@
 
 public enum ColorScheme
 {
+    Default,
     Colorful,
     Light,
     Dark,
