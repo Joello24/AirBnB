@@ -51,7 +51,7 @@ public class HostDatabaseRepository: IHostRepo
                 host.State = (string) reader["state"];
                 host.PostalCode = (int) reader["postal_code"];
                 host.weekdayRate = (int) reader["standard_rate"];
-                host.weekendRate = (int) reader["weekend_rate"];
+                host.weekendRate = (decimal) reader["weekend_rate"];
                 ret.Add(host);
             }
         }

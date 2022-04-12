@@ -17,7 +17,7 @@ public class HostRepoDouble : IHostRepo
         City = "Boise",
         State = "ID",
         PostalCode = 83757,
-        weekdayRate = 200m,
+        //weekdayRate = 200m,
         weekendRate = 250m
     };
     public static readonly Host Host2 = new Host()

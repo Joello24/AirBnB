@@ -11,7 +11,7 @@ public class Host
     public string City { get; set; }
     
     public Listing listing { get; set; }
-    public decimal weekdayRate { get; set; }
+    public int weekdayRate { get; set; }
     public decimal weekendRate { get; set; }
     public string Address { get; set; }
     public int PostalCode { get; set; }

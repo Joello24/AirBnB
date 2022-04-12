@@ -91,12 +91,12 @@ public class ReservationDatabaseRepository : IReservationRepo
     public List<Reservation> GetAllReservations()
     { 
         string sql = "SELECT * FROM Reservation WHERE 1=1";
-        List<Reservation> ret = new List<Reservation>();
-        SqlCommand cmd = new SqlCommand(sql, _conn);
-        SqlDataReader reader = cmd.ExecuteReader();
+        List<Reservation> ret = new List<Reservation>(); 
         try
         {
             _conn.Open();
+            SqlCommand cmd = new SqlCommand(sql, _conn);
+            SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 Reservation reservation = new Reservation();
@@ -121,7 +121,7 @@ public class ReservationDatabaseRepository : IReservationRepo
         }
         finally
         {
-            reader.Close();
+            
             _conn.Close();
         }
         return ret;

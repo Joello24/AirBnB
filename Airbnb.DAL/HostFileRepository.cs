@@ -57,7 +57,7 @@ public class HostFileRepository : IHostRepo
         host.City = columns[5];
         host.State = columns[6];
         host.PostalCode = int.Parse(columns[7]);
-        host.weekdayRate = decimal.Parse(columns[8].Contains("$") ? columns[8].Replace("$", "") : columns[8]);
+        //host.weekdayRate = decimal.Parse(columns[8].Contains("$") ? columns[8].Replace("$", "") : columns[8]);
         host.weekendRate = decimal.Parse(columns[9].Contains("$") ? columns[9].Replace("$", "") : columns[9]);
         return host;
     }
