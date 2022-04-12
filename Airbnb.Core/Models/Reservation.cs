@@ -9,7 +9,7 @@ public class Reservation
     public DateOnly endDate { get; set; }
     public Guest guest { get; set; }
     public Host host { get; set; }
-    public Property property { get; set; }
+    public Listing listing { get; set; }
     public decimal totalPrice { get; set; }
 
     public ColorScheme colorScheme { get; set; }

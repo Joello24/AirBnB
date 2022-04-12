@@ -11,18 +11,27 @@ public class Controller
     private readonly GuestService _guestService;
     private readonly HostService _hostService;
     private readonly ReservationService _reservationService;
+    private readonly ListingService _listingService;
     public static int Timeout = 0;
     public static bool ClearViewOnReset = false;
-    public Controller(GuestService guestService, HostService hostService, ReservationService reservationService)
+    public Controller(GuestService guestService, HostService hostService, ReservationService reservationService, ListingService listingService)
     {
         _guestService = guestService;
         _hostService = hostService;
         _reservationService = reservationService;
+        _listingService = listingService;
     }
     
 
     public void Run()
     {
+        List<Reservation> reservations = new List<Reservation>();
+        reservations = _listingService.GetAllListings();
+        foreach (var r in reservations)
+        {
+            
+            Console.WriteLine(r.ToString());
+        }
         RunAppLoop();
     }
     private void RunAppLoop()

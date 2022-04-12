@@ -18,7 +18,12 @@ public class HostService
     }
     public Result<Host> FindByEmail(string email)
     {
-        var result = _hostRepo.FindByEmail(email);
+        Result<Host> result = new Result<Host>();
+        result.Value = _hostRepo.FindAll().Value.FirstOrDefault(x => x.Email == email);
+        if(result.Value == null)
+        {
+            result.AddMessage("Host not found");
+        }
         return result;
     }
     public List<Host> FindByNameSearch(string namePrefix)

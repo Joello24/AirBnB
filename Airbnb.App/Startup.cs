@@ -1,6 +1,7 @@
 using Airbnb.Core;
 using Ninject;
 using Airbnb.Core;
+using Airbnb.Core.Enums;
 using Airbnb.DAL.Database;
 using Airbnb.UI;
 
@@ -15,9 +16,7 @@ public static class Startup
     const string hostFile = dataDir + "hosts.csv";
     const string logFile = dataDir + "log.error.csv";
     const string reservationsDir = dataDir + "reservations/";
-  
-    ReservationDBRepo reservationRepo = new ReservationDBRepo();
-    
+
     View.DisplayHeader("Welcome to Air-BnB!");
     
     LoggingMode logMode = (LoggingMode)View.GetLoggingMode() switch
@@ -28,7 +27,7 @@ public static class Startup
       _ => throw new ArgumentOutOfRangeException()
     };
 
-    NinjectContainer.Configure(logMode, guestFile,hostFile,reservationsDir, logFile );
+    NinjectContainer.Configure(logMode, guestFile,hostFile,reservationsDir, logFile, ApplicationMode.Database);
     var controller = NinjectContainer.Kernel.Get<Controller>();
     
     controller.Run();

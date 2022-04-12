@@ -93,6 +93,11 @@ public class ResRepoDouble : IReservationRepo
         return result;
     }
 
+    public List<Reservation> GetAllReservations()
+    {
+        throw new NotImplementedException();
+    }
+
     public List<Reservation> GetAllReservations(List<Host> hosts)
     {
         throw new NotImplementedException();

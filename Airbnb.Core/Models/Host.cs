@@ -10,7 +10,7 @@ public class Host
     public string State { get; set; }
     public string City { get; set; }
     
-    public Property Property { get; set; }
+    public Listing listing { get; set; }
     public decimal weekdayRate { get; set; }
     public decimal weekendRate { get; set; }
     public string Address { get; set; }

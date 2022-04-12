@@ -153,8 +153,8 @@ public class ReservationService
     public List<Reservation> GetAllReservations()
     {
         List<Host> hosts = _hostRepository.FindAll().Value;
-        _reservationRepository.GetAllReservations(hosts);
-        return _reservationRepository.GetAllReservations(hosts);
+        _reservationRepository.GetAllReservations();
+        return _reservationRepository.GetAllReservations();
     }
 
     private decimal CalculateTotalCost(decimal weekdayRate, decimal weekendRate, DateOnly startDate, DateOnly endDate)

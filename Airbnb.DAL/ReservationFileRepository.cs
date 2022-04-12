@@ -113,26 +113,9 @@ public class ReservationFileRepository : IReservationRepo
         return result;
     }
 
-    public List<Reservation> GetAllReservations(List<Host> hosts)
+    public List<Reservation> GetAllReservations()
     {
-        var reservations = new List<Reservation>();
-        foreach (var host in hosts)
-        {
-            var grabber = new Result<List<Reservation>>();
-            try
-            {
-                grabber = GetReservationsByHost(host.Id);
-            }
-            catch (Exception e)
-            {
-                _logger.Log(e.ToString());
-                throw;
-            }
-
-            if(grabber.Success)
-                reservations.AddRange(grabber.Value);
-        }
-        return reservations;
+        throw new NotImplementedException();
     }
 
     private Reservation DeserializeReservation(string[] columns, string hostID)

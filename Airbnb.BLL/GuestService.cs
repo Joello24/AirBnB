@@ -40,22 +40,22 @@ public class GuestService
         };
         return ret;
     }
-    public Result<Guest> Create(Guest guest)
-    {
-        var ret = new Result<Guest>();
-        ret = _guestRepository.Create(guest);
-        return ret;
-    }
-    public Result<Guest> Update(Guest guest)
-    {
-        var ret = new Result<Guest>();
-        ret = _guestRepository.Update(guest);
-        return ret;
-    }
-    public Result<Guest> Delete(int id)
-    {
-        var ret = new Result<Guest>();
-        ret = _guestRepository.Delete(id);
-        return ret;
-    }
+    // public Result<Guest> Create(Guest guest)
+    // {
+    //     var ret = new Result<Guest>();
+    //     ret = _guestRepository.Create(guest);
+    //     return ret;
+    // }
+    // public Result<Guest> Update(Guest guest)
+    // {
+    //     var ret = new Result<Guest>();
+    //     ret = _guestRepository.Update(guest);
+    //     return ret;
+    // }
+    // public Result<Guest> Delete(int id)
+    // {
+    //     var ret = new Result<Guest>();
+    //     ret = _guestRepository.Delete(id);
+    //     return ret;
+    // }
 }
