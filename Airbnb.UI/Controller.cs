@@ -249,7 +249,7 @@ public class Controller
                 host = SearchHostByEmail();
                 return host;
                 break;
-                    
+                      
             case 2:
                 host = SearchHostByName();
                 return host;
